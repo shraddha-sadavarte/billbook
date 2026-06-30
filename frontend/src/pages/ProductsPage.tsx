@@ -1,26 +1,92 @@
 import { useState, type FormEvent } from "react";
-import { Plus, Search, Trash2 } from "lucide-react";
-import { useProducts, useCreateProduct, useDeleteProduct } from "../hooks/useProducts";
+import { Plus, Search, Trash2, Edit2 } from "lucide-react";
+import { useProducts, useCreateProduct, useDeleteProduct, useUpdateProduct } from "../hooks/useProducts";
 import { TableSkeleton } from "../components/ui/Skeletons";
+import { Modal } from "../components/ui/Modal";
 import { formatMoney } from "../utils/format";
+import type { Product } from "../types";
 
 export function ProductsPage() {
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: "", unit_price: 0, tax_rate: 0, stock_quantity: 0, unit: "pcs" });
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
-  const { data, isLoading } = useProducts({ search });
+  // Form states for creating
+  const [form, setForm] = useState({
+    name: "",
+    sku: "",
+    description: "",
+    unit_price: 0,
+    tax_rate: 0,
+    stock_quantity: 0,
+    unit: "pcs",
+  });
+
+  // Form states for editing
+  const [editForm, setEditForm] = useState({
+    name: "",
+    sku: "",
+    description: "",
+    unit_price: 0,
+    tax_rate: 0,
+    stock_quantity: 0,
+    unit: "pcs",
+  });
+
+  const { data, isLoading } = useProducts({ page, search });
   const createProduct = useCreateProduct();
   const deleteProduct = useDeleteProduct();
+  const updateProduct = useUpdateProduct();
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleCreateSubmit = (e: FormEvent) => {
     e.preventDefault();
     createProduct.mutate(form, {
       onSuccess: () => {
-        setForm({ name: "", unit_price: 0, tax_rate: 0, stock_quantity: 0, unit: "pcs" });
+        setForm({
+          name: "",
+          sku: "",
+          description: "",
+          unit_price: 0,
+          tax_rate: 0,
+          stock_quantity: 0,
+          unit: "pcs",
+        });
         setShowForm(false);
       },
     });
+  };
+
+  const handleEditClick = (p: Product) => {
+    setEditingProduct(p);
+    setEditForm({
+      name: p.name,
+      sku: p.sku || "",
+      description: p.description || "",
+      unit_price: p.unit_price,
+      tax_rate: p.tax_rate,
+      stock_quantity: p.stock_quantity,
+      unit: p.unit,
+    });
+  };
+
+  const handleEditSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!editingProduct) return;
+    updateProduct.mutate(
+      { id: editingProduct.id, payload: editForm },
+      {
+        onSuccess: () => {
+          setEditingProduct(null);
+        },
+      }
+    );
+  };
+
+  const handleDelete = (id: number) => {
+    if (confirm("Are you sure you want to remove this product?")) {
+      deleteProduct.mutate(id);
+    }
   };
 
   return (
@@ -32,7 +98,7 @@ export function ProductsPage() {
         </div>
         <button
           onClick={() => setShowForm((v) => !v)}
-          className="flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark"
+          className="flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark shadow-sm"
         >
           <Plus size={16} />
           Add Product
@@ -41,56 +107,99 @@ export function ProductsPage() {
 
       {showForm && (
         <form
-          onSubmit={handleSubmit}
-          className="grid grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-white p-5 sm:grid-cols-4"
+          onSubmit={handleCreateSubmit}
+          className="grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-white p-6 sm:grid-cols-4 shadow-sm"
         >
-          <input
-            required
-            placeholder="Product name"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand sm:col-span-2"
-          />
-          <input
-            type="number"
-            min={0}
-            step="0.01"
-            placeholder="Unit price"
-            value={form.unit_price || ""}
-            onChange={(e) => setForm({ ...form, unit_price: Number(e.target.value) || 0 })}
-            className="rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
-          />
-          <input
-            type="number"
-            min={0}
-            max={100}
-            step="0.01"
-            placeholder="Tax %"
-            value={form.tax_rate || ""}
-            onChange={(e) => setForm({ ...form, tax_rate: Number(e.target.value) || 0 })}
-            className="rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
-          />
-          <input
-            type="number"
-            min={0}
-            placeholder="Stock qty"
-            value={form.stock_quantity || ""}
-            onChange={(e) => setForm({ ...form, stock_quantity: Number(e.target.value) || 0 })}
-            className="rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
-          />
-          <input
-            placeholder="Unit (pcs, kg, hr…)"
-            value={form.unit}
-            onChange={(e) => setForm({ ...form, unit: e.target.value })}
-            className="rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
-          />
-          <button
-            type="submit"
-            disabled={createProduct.isPending}
-            className="rounded-lg bg-ink-900 px-4 py-2 text-sm font-medium text-white hover:bg-ink-700 disabled:opacity-50 sm:col-span-4"
-          >
-            {createProduct.isPending ? "Saving…" : "Save product"}
-          </button>
+          <div className="sm:col-span-2">
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Product Name</label>
+            <input
+              required
+              placeholder="e.g. Wireless Mouse"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">SKU</label>
+            <input
+              placeholder="e.g. TECH-MSE-01"
+              value={form.sku}
+              onChange={(e) => setForm({ ...form, sku: e.target.value })}
+              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Unit Price (₹)</label>
+            <input
+              type="number"
+              min={0}
+              step="0.01"
+              required
+              placeholder="0.00"
+              value={form.unit_price || ""}
+              onChange={(e) => setForm({ ...form, unit_price: Number(e.target.value) || 0 })}
+              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Tax Rate (%)</label>
+            <input
+              type="number"
+              min={0}
+              max={100}
+              step="0.01"
+              placeholder="e.g. 18"
+              value={form.tax_rate || ""}
+              onChange={(e) => setForm({ ...form, tax_rate: Number(e.target.value) || 0 })}
+              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Stock Qty</label>
+            <input
+              type="number"
+              min={0}
+              placeholder="e.g. 100"
+              value={form.stock_quantity || ""}
+              onChange={(e) => setForm({ ...form, stock_quantity: Number(e.target.value) || 0 })}
+              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Unit</label>
+            <input
+              placeholder="e.g. pcs, box, kg"
+              value={form.unit}
+              onChange={(e) => setForm({ ...form, unit: e.target.value })}
+              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
+            />
+          </div>
+          <div className="sm:col-span-4">
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Description</label>
+            <textarea
+              placeholder="Add product specifications or notes..."
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand h-20 resize-none"
+            />
+          </div>
+          <div className="sm:col-span-4 flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setShowForm(false)}
+              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={createProduct.isPending}
+              className="rounded-lg bg-brand px-5 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
+            >
+              {createProduct.isPending ? "Saving…" : "Save Product"}
+            </button>
+          </div>
         </form>
       )}
 
@@ -98,49 +207,76 @@ export function ProductsPage() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
         <input
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search products…"
-          className="w-full max-w-sm rounded-lg border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+          placeholder="Search products by name…"
+          className="w-full max-w-sm rounded-lg border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand shadow-sm"
         />
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-        <table className="w-full min-w-[640px] text-sm">
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+        <table className="w-full min-w-[760px] text-sm">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs font-medium text-slate-500">
-              <th className="px-4 py-3">Name</th>
+              <th className="px-4 py-3">SKU</th>
+              <th className="px-4 py-3">Product Name</th>
               <th className="px-4 py-3 text-right">Unit Price</th>
-              <th className="px-4 py-3 text-right">Tax</th>
-              <th className="px-4 py-3 text-right">Stock</th>
-              <th className="w-10 px-4 py-3" />
+              <th className="px-4 py-3 text-right">Tax Rate</th>
+              <th className="px-4 py-3 text-right">Stock Status</th>
+              <th className="w-24 px-4 py-3 text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
-              <TableSkeleton rows={5} cols={5} />
+              <TableSkeleton rows={5} cols={6} />
             ) : data?.items.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-10 text-center text-sm text-slate-400">
-                  No products yet.
+                <td colSpan={6} className="px-4 py-10 text-center text-sm text-slate-400">
+                  No products found matching your search.
                 </td>
               </tr>
             ) : (
               data?.items.map((p) => (
-                <tr key={p.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
-                  <td className="px-4 py-3 font-medium text-ink-900">{p.name}</td>
-                  <td className="figures px-4 py-3 text-right text-ink-900">{formatMoney(p.unit_price)}</td>
+                <tr key={p.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/65 transition-colors">
+                  <td className="px-4 py-3 text-slate-500 font-mono text-xs">{p.sku || "—"}</td>
+                  <td className="px-4 py-3">
+                    <p className="font-semibold text-ink-900">{p.name}</p>
+                    {p.description && <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">{p.description}</p>}
+                  </td>
+                  <td className="figures px-4 py-3 text-right font-medium text-ink-900">{formatMoney(p.unit_price)}</td>
                   <td className="figures px-4 py-3 text-right text-slate-500">{p.tax_rate}%</td>
                   <td className="figures px-4 py-3 text-right text-slate-500">
-                    {p.stock_quantity} {p.unit}
+                    <span
+                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
+                        p.stock_quantity === 0
+                          ? "bg-danger-light text-danger"
+                          : p.stock_quantity <= 5
+                          ? "bg-warn-light text-warn"
+                          : "bg-success-light text-success"
+                      }`}
+                    >
+                      {p.stock_quantity} {p.unit}
+                    </span>
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <button
-                      onClick={() => deleteProduct.mutate(p.id)}
-                      className="rounded-md p-1.5 text-slate-400 hover:bg-danger-light hover:text-danger"
-                      aria-label="Delete product"
-                    >
-                      <Trash2 size={15} />
-                    </button>
+                    <div className="flex items-center justify-center gap-1">
+                      <button
+                        onClick={() => handleEditClick(p)}
+                        className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-ink-900 transition-colors"
+                        aria-label="Edit product"
+                      >
+                        <Edit2 size={14} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(p.id)}
+                        className="rounded-md p-1.5 text-slate-400 hover:bg-danger-light hover:text-danger transition-colors"
+                        aria-label="Delete product"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -148,6 +284,125 @@ export function ProductsPage() {
           </tbody>
         </table>
       </div>
+
+      {data && data.pages > 1 && (
+        <div className="flex items-center justify-center gap-2">
+          <button
+            disabled={page <= 1}
+            onClick={() => setPage((p) => p - 1)}
+            className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 disabled:opacity-40 hover:bg-slate-50 transition-colors"
+          >
+            Previous
+          </button>
+          <span className="text-sm text-slate-500">
+            Page {data.page} of {data.pages}
+          </span>
+          <button
+            disabled={page >= data.pages}
+            onClick={() => setPage((p) => p + 1)}
+            className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 disabled:opacity-40 hover:bg-slate-50 transition-colors"
+          >
+            Next
+          </button>
+        </div>
+      )}
+
+      {/* ── Edit Product Modal ───────────────────────────────────────── */}
+      <Modal
+        isOpen={editingProduct !== null}
+        onClose={() => setEditingProduct(null)}
+        title="Edit Product"
+      >
+        <form onSubmit={handleEditSubmit} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Product Name</label>
+            <input
+              required
+              value={editForm.name}
+              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">SKU</label>
+              <input
+                value={editForm.sku}
+                onChange={(e) => setEditForm({ ...editForm, sku: e.target.value })}
+                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Unit</label>
+              <input
+                value={editForm.unit}
+                onChange={(e) => setEditForm({ ...editForm, unit: e.target.value })}
+                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Unit Price</label>
+              <input
+                type="number"
+                min={0}
+                step="0.01"
+                required
+                value={editForm.unit_price || ""}
+                onChange={(e) => setEditForm({ ...editForm, unit_price: Number(e.target.value) || 0 })}
+                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Tax Rate (%)</label>
+              <input
+                type="number"
+                min={0}
+                max={100}
+                step="0.01"
+                value={editForm.tax_rate || ""}
+                onChange={(e) => setEditForm({ ...editForm, tax_rate: Number(e.target.value) || 0 })}
+                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Stock Qty</label>
+              <input
+                type="number"
+                min={0}
+                value={editForm.stock_quantity || ""}
+                onChange={(e) => setEditForm({ ...editForm, stock_quantity: Number(e.target.value) || 0 })}
+                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Description</label>
+            <textarea
+              value={editForm.description}
+              onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand h-20 resize-none"
+            />
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              onClick={() => setEditingProduct(null)}
+              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={updateProduct.isPending}
+              className="rounded-lg bg-brand px-5 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
+            >
+              {updateProduct.isPending ? "Saving…" : "Save Changes"}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }
