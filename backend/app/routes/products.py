@@ -1,0 +1,78 @@
+from flask import Blueprint, request, jsonify, g
+from marshmallow import ValidationError
+
+from app.extensions import db
+from app.models import Product
+from app.schemas import ProductSchema
+from app.tenant_scope import TenantContext
+from app.utils.decorators import require_auth
+
+products_bp = Blueprint("products", __name__, url_prefix="/api/v1/products")
+
+
+@products_bp.route("", methods=["GET"])
+@require_auth
+def list_products():
+    page = request.args.get("page", 1, type=int)
+    per_page = min(request.args.get("per_page", 20, type=int), 100)
+    search = request.args.get("search", "").strip()
+
+    query = Product.query.filter_by(is_active=True)
+    if search:
+        query = query.filter(Product.name.ilike(f"%{search}%"))
+
+    pagination = query.order_by(Product.name.asc()).paginate(page=page, per_page=per_page, error_out=False)
+    return jsonify(
+        {
+            "items": [p.to_dict() for p in pagination.items],
+            "total": pagination.total,
+            "page": page,
+            "pages": pagination.pages,
+        }
+    )
+
+
+@products_bp.route("/<int:product_id>", methods=["GET"])
+@require_auth
+def get_product(product_id):
+    product = Product.query.get_or_404(product_id)
+    return jsonify(product.to_dict())
+
+
+@products_bp.route("", methods=["POST"])
+@require_auth
+def create_product():
+    try:
+        data = ProductSchema().load(request.get_json(force=True) or {})
+    except ValidationError as err:
+        return jsonify({"error": "Validation failed", "details": err.messages}), 422
+
+    product = Product(tenant_id=TenantContext.get(), **data)
+    db.session.add(product)
+    db.session.commit()
+    return jsonify(product.to_dict()), 201
+
+
+@products_bp.route("/<int:product_id>", methods=["PUT"])
+@require_auth
+def update_product(product_id):
+    product = Product.query.get_or_404(product_id)
+    try:
+        data = ProductSchema(partial=True).load(request.get_json(force=True) or {})
+    except ValidationError as err:
+        return jsonify({"error": "Validation failed", "details": err.messages}), 422
+
+    for key, value in data.items():
+        setattr(product, key, value)
+    db.session.commit()
+    return jsonify(product.to_dict())
+
+
+@products_bp.route("/<int:product_id>", methods=["DELETE"])
+@require_auth
+def delete_product(product_id):
+    """Soft delete — keeps invoice history intact even if a product is retired."""
+    product = Product.query.get_or_404(product_id)
+    product.is_active = False
+    db.session.commit()
+    return "", 204

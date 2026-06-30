@@ -1,0 +1,141 @@
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt
+from marshmallow import ValidationError
+
+from app.extensions import db
+from app.models import Tenant, User, Role, seed_default_roles
+from app.schemas import SignupSchema, LoginSchema
+from app.tenant_scope import TenantContext
+
+auth_bp = Blueprint("auth", __name__, url_prefix="/api/v1/auth")
+
+
+def _slugify(name: str) -> str:
+    base = "".join(c.lower() if c.isalnum() else "-" for c in name).strip("-")
+    while "--" in base:
+        base = base.replace("--", "-")
+    return base or "tenant"
+
+
+def _issue_tokens(user: User) -> dict:
+    permissions = list(user.role_ref.permissions) if user.role_ref else []
+    claims = {
+        "tenant_id": user.tenant_id,
+        "is_super_admin": user.is_super_admin,
+        "role_id": user.role_id,
+        "permissions": permissions,
+    }
+    # identity must be a string — flask-jwt-extended stores it as the JWT "sub" claim
+    access_token = create_access_token(identity=str(user.id), additional_claims=claims)
+    refresh_token = create_refresh_token(identity=str(user.id), additional_claims=claims)
+    return {"access_token": access_token, "refresh_token": refresh_token}
+
+
+@auth_bp.route("/signup", methods=["POST"])
+def signup():
+    """
+    Tenant onboarding: creates the Tenant, seeds the two default Roles
+    (Tenant Admin + Staff — see seed_default_roles), and creates the first
+    user assigned to the Tenant Admin role. No tenant context exists yet,
+    so these queries run unscoped (correct, since we're creating the
+    tenant, not reading inside one).
+    """
+    schema = SignupSchema()
+    try:
+        data = schema.load(request.get_json(force=True) or {})
+    except ValidationError as err:
+        return jsonify({"error": "Validation failed", "details": err.messages}), 422
+
+    if User.query.filter_by(email=data["email"]).first():
+        return jsonify({"error": "An account with this email already exists"}), 409
+
+    slug_base = _slugify(data["company_name"])
+    slug = slug_base
+    suffix = 1
+    while Tenant.query.filter_by(slug=slug).first():
+        suffix += 1
+        slug = f"{slug_base}-{suffix}"
+
+    tenant = Tenant(company_name=data["company_name"], slug=slug, billing_email=data["email"])
+    db.session.add(tenant)
+    db.session.flush()  # get tenant.id before creating roles/user
+
+    admin_role = seed_default_roles(tenant.id)
+
+    admin = User(
+        tenant_id=tenant.id,
+        name=data["admin_name"],
+        email=data["email"],
+        role_id=admin_role.id,
+    )
+    admin.set_password(data["password"])
+    db.session.add(admin)
+    db.session.commit()
+
+    tokens = _issue_tokens(admin)
+    return (
+        jsonify({"tenant": tenant.to_dict(), "user": admin.to_dict(), **tokens}),
+        201,
+    )
+
+
+@auth_bp.route("/login", methods=["POST"])
+def login():
+    schema = LoginSchema()
+    try:
+        data = schema.load(request.get_json(force=True) or {})
+    except ValidationError as err:
+        return jsonify({"error": "Validation failed", "details": err.messages}), 422
+
+    # No tenant context yet — login must search across all tenants by email.
+    user = User.query.filter_by(email=data["email"]).first()
+
+    if not user or not user.check_password(data["password"]):
+        return jsonify({"error": "Invalid email or password"}), 401
+    if not user.is_active:
+        return jsonify({"error": "This account has been deactivated"}), 403
+
+    tokens = _issue_tokens(user)
+    return jsonify({"user": user.to_dict(), **tokens}), 200
+
+
+@auth_bp.route("/refresh", methods=["POST"])
+@jwt_required(refresh=True)
+def refresh():
+    from flask_jwt_extended import get_jwt_identity
+
+    claims = get_jwt()
+    identity = get_jwt_identity()
+
+    # Re-read the user so permission changes (e.g. an admin edited this
+    # user's role) take effect on the next refresh, not just at next login.
+    TenantContext.set(claims.get("tenant_id"))
+    user = User.query.get(int(identity))
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    new_claims = {
+        "tenant_id": user.tenant_id,
+        "is_super_admin": user.is_super_admin,
+        "role_id": user.role_id,
+        "permissions": list(user.role_ref.permissions) if user.role_ref else [],
+    }
+    access_token = create_access_token(identity=identity, additional_claims=new_claims)
+    return jsonify({"access_token": access_token}), 200
+
+
+@auth_bp.route("/me", methods=["GET"])
+@jwt_required()
+def me():
+    claims = get_jwt()
+    TenantContext.set(claims.get("tenant_id"))
+    from flask_jwt_extended import get_jwt_identity
+
+    user = User.query.get(int(get_jwt_identity()))
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    data = user.to_dict()
+    data["permissions"] = list(user.role_ref.permissions) if user.role_ref else (
+        ["*"] if user.is_super_admin else []
+    )
+    return jsonify(data), 200

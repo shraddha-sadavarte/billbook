@@ -1,0 +1,56 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import * as customersApi from "../api/customers";
+
+export function useCustomers(params: { page?: number; search?: string } = {}) {
+  return useQuery({
+    queryKey: ["customers", params],
+    queryFn: () => customersApi.listCustomers(params),
+    placeholderData: (prev) => prev, // keep old page visible while fetching next page
+  });
+}
+
+export function useCustomer(id: number | undefined) {
+  return useQuery({
+    queryKey: ["customers", id],
+    queryFn: () => customersApi.getCustomer(id as number),
+    enabled: id !== undefined,
+  });
+}
+
+export function useCreateCustomer() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: customersApi.createCustomer,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
+      toast.success("Customer added");
+    },
+    onError: () => toast.error("Couldn't add customer. Check the details and try again."),
+  });
+}
+
+export function useUpdateCustomer() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: customersApi.CustomerPayload }) =>
+      customersApi.updateCustomer(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
+      toast.success("Customer updated");
+    },
+    onError: () => toast.error("Couldn't save changes."),
+  });
+}
+
+export function useDeleteCustomer() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: customersApi.deleteCustomer,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
+      toast.success("Customer removed");
+    },
+    onError: () => toast.error("Couldn't remove customer."),
+  });
+}
