@@ -84,7 +84,7 @@ export function ProductsPage() {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm("Are you sure you want to remove this product?")) {
+    if (confirm("Are you sure you want to remove this product....?")) {
       deleteProduct.mutate(id);
     }
   };
