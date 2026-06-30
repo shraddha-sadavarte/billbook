@@ -2,6 +2,7 @@ from datetime import date
 
 from flask import Blueprint, request, jsonify, g
 from marshmallow import ValidationError
+from sqlalchemy.exc import IntegrityError
 
 from app.extensions import db
 from app.models import Invoice, InvoiceItem, InvoiceStatus
@@ -14,13 +15,25 @@ invoices_bp = Blueprint("invoices", __name__, url_prefix="/api/v1/invoices")
 
 def _generate_invoice_number() -> str:
     """
-    Simple per-tenant sequential numbering: INV-0001, INV-0002, ...
-    Counts existing invoices for the tenant (auto-scoped by tenant_scope.py).
-    For high-concurrency production use, back this with a DB sequence/lock
-    instead of a count-based approach to avoid race conditions.
+    Per-tenant sequential numbering: INV-0001, INV-0002, ...
+    This uses the latest inserted invoice number and retries on duplicate
+    collisions to reduce race condition failures in concurrent workloads.
     """
-    count = Invoice.query.count()
-    return f"INV-{count + 1:04d}"
+    last_number = (
+        Invoice.query.filter(Invoice.tenant_id == TenantContext.get())
+        .order_by(Invoice.id.desc())
+        .with_entities(Invoice.invoice_number)
+        .limit(1)
+        .scalar()
+    )
+    if last_number and last_number.startswith("INV-"):
+        try:
+            seq = int(last_number.split("-", 1)[1])
+        except ValueError:
+            seq = 0
+    else:
+        seq = 0
+    return f"INV-{seq + 1:04d}"
 
 
 @invoices_bp.route("", methods=["GET"])
@@ -76,33 +89,45 @@ def create_invoice():
 
     items_data = data.pop("items")
 
-    invoice = Invoice(
-        tenant_id=TenantContext.get(),
-        invoice_number=_generate_invoice_number(),
-        customer_id=data["customer_id"],
-        issue_date=data.get("issue_date") or date.today(),
-        due_date=data.get("due_date"),
-        discount_type=data.get("discount_type", "flat"),
-        discount_value=data.get("discount_value", 0),
-        notes=data.get("notes"),
-        status=InvoiceStatus(data.get("status", "draft")),
-    )
-
-    for item_data in items_data:
-        invoice.items.append(
-            InvoiceItem(
-                product_id=item_data.get("product_id"),
-                description=item_data["description"],
-                quantity=item_data["quantity"],
-                unit_price=item_data["unit_price"],
-                tax_rate=item_data.get("tax_rate", 0),
-            )
+    invoice = None
+    for attempt in range(5):
+        invoice_number = _generate_invoice_number()
+        invoice = Invoice(
+            tenant_id=TenantContext.get(),
+            invoice_number=invoice_number,
+            customer_id=data["customer_id"],
+            issue_date=data.get("issue_date") or date.today(),
+            due_date=data.get("due_date"),
+            discount_type=data.get("discount_type", "flat"),
+            discount_value=data.get("discount_value", 0),
+            notes=data.get("notes"),
+            status=InvoiceStatus(data.get("status", "draft")),
         )
 
-    invoice.recalculate_totals()
-    db.session.add(invoice)
-    db.session.commit()
-    return jsonify(invoice.to_dict()), 201
+        for item_data in items_data:
+            invoice.items.append(
+                InvoiceItem(
+                    product_id=item_data.get("product_id"),
+                    description=item_data["description"],
+                    quantity=item_data["quantity"],
+                    unit_price=item_data["unit_price"],
+                    tax_rate=item_data.get("tax_rate", 0),
+                )
+            )
+
+        invoice.recalculate_totals()
+        if invoice.status == InvoiceStatus.PAID:
+            invoice.amount_paid = invoice.grand_total
+
+        db.session.add(invoice)
+        try:
+            db.session.commit()
+            return jsonify(invoice.to_dict()), 201
+        except IntegrityError:
+            db.session.rollback()
+            continue
+
+    return jsonify({"error": "Unable to generate an invoice number. Please retry."}), 500
 
 
 @invoices_bp.route("/<int:invoice_id>", methods=["PUT"])
@@ -136,6 +161,16 @@ def update_invoice(invoice_id):
             )
 
     invoice.recalculate_totals()
+    if invoice.amount_paid and invoice.amount_paid > invoice.grand_total:
+        invoice.amount_paid = invoice.grand_total
+
+    if invoice.status == InvoiceStatus.PAID:
+        invoice.amount_paid = invoice.grand_total
+    elif invoice.amount_paid >= invoice.grand_total:
+        invoice.status = InvoiceStatus.PAID
+    elif invoice.amount_paid > 0:
+        invoice.status = InvoiceStatus.PENDING
+
     db.session.commit()
     return jsonify(invoice.to_dict())
 

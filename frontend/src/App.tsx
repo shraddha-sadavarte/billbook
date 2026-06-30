@@ -7,8 +7,12 @@ import { DashboardLayout } from "./layouts/DashboardLayout";
 import { LoginPage } from "./pages/LoginPage";
 import { SignupPage } from "./pages/SignupPage";
 import { DashboardPage } from "./pages/DashboardPage";
-import { InvoicesPage } from "./pages/InvoicesPage";
-import { CreateInvoicePage } from "./pages/CreateInvoicePage";
+import { POSPage } from "./pages/POSPage";
+import { SalesLayout } from "./pages/sales/SalesLayout";
+import { SalesListPage } from "./pages/sales/SalesListPage";
+import { AddSalePage } from "./pages/sales/AddSalePage";
+import { SalesPaymentsPage } from "./pages/sales/SalesPaymentsPage";
+import { SalesReturnsPage } from "./pages/sales/SalesReturnsPage";
 import { InvoiceDetailPage } from "./pages/InvoiceDetailPage";
 import { CustomersPage } from "./pages/CustomersPage";
 import { ProductsPage } from "./pages/ProductsPage";
@@ -42,9 +46,15 @@ export default function App() {
               }
             >
               <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/invoices" element={<InvoicesPage />} />
-              <Route path="/invoices/new" element={<CreateInvoicePage />} />
-              <Route path="/invoices/:id" element={<InvoiceDetailPage />} />
+              <Route path="/sales" element={<SalesLayout />}>
+                <Route index element={<SalesListPage />} />
+                <Route path="add" element={<AddSalePage />} />
+                <Route path="pos" element={<POSPage />} />
+                <Route path="payments" element={<SalesPaymentsPage />} />
+                <Route path="returns" element={<SalesReturnsPage />} />
+                <Route path=":id" element={<InvoiceDetailPage />} />
+              </Route>
+              <Route path="/pos" element={<Navigate to="/sales/pos" replace />} />
               <Route path="/customers" element={<CustomersPage />} />
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/users" element={<UsersPage />} />

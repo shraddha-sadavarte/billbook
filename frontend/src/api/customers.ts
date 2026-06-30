@@ -9,7 +9,7 @@ export interface CustomerPayload {
   gstin?: string | null;
 }
 
-export async function listCustomers(params: { page?: number; search?: string } = {}) {
+export async function listCustomers(params: { page?: number; per_page?: number; search?: string } = {}) {
   const { data } = await apiClient.get<PaginatedResponse<Customer>>("/customers", { params });
   return data;
 }

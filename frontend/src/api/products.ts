@@ -11,7 +11,7 @@ export interface ProductPayload {
   unit?: string;
 }
 
-export async function listProducts(params: { page?: number; search?: string } = {}) {
+export async function listProducts(params: { page?: number; per_page?: number; search?: string } = {}) {
   const { data } = await apiClient.get<PaginatedResponse<Product>>("/products", { params });
   return data;
 }
