@@ -4,7 +4,6 @@ const NAV_ITEMS = [
   { to: "", label: "Sales List" },
   { to: "add", label: "Add Sale" },
   { to: "pos", label: "POS" },
-  { to: "payments", label: "Payments" },
   { to: "returns", label: "Returns" },
 ];
 
@@ -23,10 +22,10 @@ export function SalesLayout() {
             to={item.to}
             end={item.to === ""}
             className={({ isActive }) =>
-              `rounded-full border px-4 py-2 text-sm font-medium transition ${
+              `rounded-full border px-4 py-2 text-sm font-semibold transition ${
                 isActive
-                  ? "border-brand bg-brand/10 text-brand"
-                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                  ? "border-brand bg-brand text-white shadow-sm"
+                  : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
               }`
             }
           >

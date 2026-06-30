@@ -11,9 +11,9 @@ import { POSPage } from "./pages/POSPage";
 import { SalesLayout } from "./pages/sales/SalesLayout";
 import { SalesListPage } from "./pages/sales/SalesListPage";
 import { AddSalePage } from "./pages/sales/AddSalePage";
-import { SalesPaymentsPage } from "./pages/sales/SalesPaymentsPage";
 import { SalesReturnsPage } from "./pages/sales/SalesReturnsPage";
 import { InvoiceDetailPage } from "./pages/InvoiceDetailPage";
+import { InvoicesPage } from "./pages/InvoicesPage";
 import { CustomersPage } from "./pages/CustomersPage";
 import { ProductsPage } from "./pages/ProductsPage";
 import { UsersPage } from "./pages/UsersPage";
@@ -50,11 +50,11 @@ export default function App() {
                 <Route index element={<SalesListPage />} />
                 <Route path="add" element={<AddSalePage />} />
                 <Route path="pos" element={<POSPage />} />
-                <Route path="payments" element={<SalesPaymentsPage />} />
                 <Route path="returns" element={<SalesReturnsPage />} />
                 <Route path=":id" element={<InvoiceDetailPage />} />
               </Route>
               <Route path="/pos" element={<Navigate to="/sales/pos" replace />} />
+              <Route path="/invoices" element={<InvoicesPage />} />
               <Route path="/customers" element={<CustomersPage />} />
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/users" element={<UsersPage />} />

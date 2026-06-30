@@ -20,7 +20,7 @@ import { useAuth } from "../context/AuthContext";
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, permission: "dashboard.view" },
   { to: "/sales",     label: "Sales",     icon: Receipt,          permission: "invoices.view" },
-  { to: "/pos",       label: "POS",        icon: Monitor,         permission: "invoices.view" },
+  { to: "/invoices",  label: "Invoices",  icon: FileText,        permission: "invoices.view" },
   { to: "/customers", label: "Customers", icon: Users,            permission: "customers.view" },
   { to: "/products",  label: "Products",  icon: Package,          permission: "products.view" },
   { to: "/users",     label: "Users",     icon: Users,            permission: "users.view" },
