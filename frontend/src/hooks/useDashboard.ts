@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchDashboardSummary } from "../api/dashboard";
+import { fetchDashboardSummary, type DashboardPeriod } from "../api/dashboard";
 
-export function useDashboardSummary() {
+export function useDashboardSummary(period: DashboardPeriod = "all") {
   return useQuery({
-    queryKey: ["dashboard", "summary"],
-    queryFn: fetchDashboardSummary,
-    staleTime: 30_000, // dashboard numbers don't need to refetch on every tab focus
+    queryKey: ["dashboard", "summary", period],
+    queryFn: () => fetchDashboardSummary(period),
+    staleTime: 30_000,
   });
 }

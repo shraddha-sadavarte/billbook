@@ -103,7 +103,57 @@ export interface PaginatedResponse<T> {
   pages: number;
 }
 
+export interface DashboardStats {
+  purchase_due: number;
+  sales_due: number;
+  total_sales: number;
+  expense: number;
+}
+
+export interface DashboardCounts {
+  customers: number;
+  products: number;
+  invoices: number;
+  paid_invoices: number;
+}
+
+export interface BarChartPoint {
+  label: string;
+  sales: number;
+  purchase: number;
+  expense: number;
+}
+
+export interface RecentProduct {
+  id: number;
+  name: string;
+  unit_price: number;
+}
+
+export interface StockAlertItem {
+  id: number;
+  name: string;
+  sku: string;
+  stock_quantity: number;
+  unit: string;
+}
+
+export interface TrendingItem {
+  name: string;
+  qty: number;
+}
+
 export interface DashboardSummary {
+  // New rich fields
+  stats: DashboardStats;
+  counts: DashboardCounts;
+  bar_chart: BarChartPoint[];
+  recent_products: RecentProduct[];
+  stock_alert: StockAlertItem[];
+  low_stock_threshold: number;
+  top_trending: TrendingItem[];
+  recent_invoices: Invoice[];
+  // Legacy (kept for backward compat)
   total_revenue: number;
   pending_invoices: { count: number; amount: number };
   paid_invoices: { count: number };

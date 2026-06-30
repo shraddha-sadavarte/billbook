@@ -1,31 +1,48 @@
 import type { LucideIcon } from "lucide-react";
 
+type Tone = "purple" | "red" | "green" | "navy" | "brand" | "warn" | "success" | "ink";
+
 interface StatCardProps {
   label: string;
   value: string;
   sublabel?: string;
   icon: LucideIcon;
-  tone?: "brand" | "warn" | "success" | "ink";
+  tone?: Tone;
 }
 
-const TONE_STYLES: Record<string, string> = {
-  brand: "bg-brand-light text-brand-dark",
-  warn: "bg-warn-light text-warn",
-  success: "bg-success-light text-success",
-  ink: "bg-slate-100 text-ink-700",
+const TONE_STYLES: Record<Tone, { card: string; icon: string }> = {
+  purple:  { card: "bg-gradient-to-br from-violet-600 to-purple-500 text-white",  icon: "bg-white/20 text-white" },
+  red:     { card: "bg-gradient-to-br from-red-600 to-rose-400 text-white",        icon: "bg-white/20 text-white" },
+  green:   { card: "bg-gradient-to-br from-emerald-600 to-teal-400 text-white",    icon: "bg-white/20 text-white" },
+  navy:    { card: "bg-gradient-to-br from-slate-800 to-blue-700 text-white",      icon: "bg-white/20 text-white" },
+  brand:   { card: "bg-white border border-slate-200",                             icon: "bg-brand-light text-brand-dark" },
+  warn:    { card: "bg-white border border-slate-200",                             icon: "bg-warn-light text-warn" },
+  success: { card: "bg-white border border-slate-200",                             icon: "bg-success-light text-success" },
+  ink:     { card: "bg-white border border-slate-200",                             icon: "bg-slate-100 text-ink-700" },
 };
 
 export function StatCard({ label, value, sublabel, icon: Icon, tone = "ink" }: StatCardProps) {
+  const styles = TONE_STYLES[tone];
+  const isColored = ["purple", "red", "green", "navy"].includes(tone);
+
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 transition-shadow hover:shadow-sm">
+    <div
+      className={`rounded-xl p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md ${styles.card}`}
+    >
       <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm text-slate-500">{label}</p>
-          <p className="figures mt-1.5 text-2xl font-semibold text-ink-900">{value}</p>
-          {sublabel && <p className="mt-1 text-xs text-slate-400">{sublabel}</p>}
+        <div className="flex-1 min-w-0">
+          <p className={`text-xs font-semibold tracking-widest uppercase ${isColored ? "text-white/80" : "text-slate-500"}`}>
+            {label}
+          </p>
+          <p className={`figures mt-2 text-3xl font-bold leading-none ${isColored ? "text-white" : "text-ink-900"}`}>
+            {value}
+          </p>
+          {sublabel && (
+            <p className={`mt-1 text-xs ${isColored ? "text-white/70" : "text-slate-400"}`}>{sublabel}</p>
+          )}
         </div>
-        <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${TONE_STYLES[tone]}`}>
-          <Icon size={20} />
+        <div className={`ml-3 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl ${styles.icon}`}>
+          <Icon size={22} />
         </div>
       </div>
     </div>

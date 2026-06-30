@@ -1,32 +1,81 @@
-import { IndianRupee, Clock, CheckCircle2, TrendingUp } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import {
+  IndianRupee,
+  ShoppingCart,
+  TrendingUp,
+  CreditCard,
+  Users,
+  Package,
+  FileText,
+  CheckCircle2,
+  AlertTriangle,
+} from "lucide-react";
 import { useDashboardSummary } from "../hooks/useDashboard";
+import type { DashboardPeriod } from "../api/dashboard";
 import { StatCard } from "../components/dashboard/StatCard";
-import { MonthlySalesChart } from "../components/dashboard/MonthlySalesChart";
-import { StatusBadge } from "../components/ui/StatusBadge";
+import { CountCard } from "../components/dashboard/CountCard";
+import { PeriodFilter } from "../components/dashboard/PeriodFilter";
+import { SalesBarChart } from "../components/dashboard/MonthlySalesChart";
+import { RecentProductsTable } from "../components/dashboard/RecentProductsTable";
+import { StockAlertTable } from "../components/dashboard/StockAlertTable";
+import { TrendingDonutChart } from "../components/dashboard/TrendingDonutChart";
+import { RecentInvoicesTable } from "../components/dashboard/RecentInvoicesTable";
 import { CardSkeleton } from "../components/ui/Skeletons";
-import { formatMoney, formatDate } from "../utils/format";
+import { formatMoney } from "../utils/format";
+import { useAuth } from "../context/AuthContext";
 
+// ── Section card wrapper ─────────────────────────────────────────────────────
+function Section({
+  title,
+  children,
+  className = "",
+}: {
+  title: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm ${className}`}>
+      <div className="border-b border-slate-100 px-5 py-3.5">
+        <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500">{title}</h2>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+// ── Main page ────────────────────────────────────────────────────────────────
 export function DashboardPage() {
-  const { data, isLoading, isError } = useDashboardSummary();
+  const [period, setPeriod] = useState<DashboardPeriod>("all");
+  const { data, isLoading, isError } = useDashboardSummary(period);
+  const { hasPermission } = useAuth();
 
   if (isError) {
     return (
-      <div className="rounded-xl border border-danger-light bg-danger-light/40 p-6 text-danger">
-        Couldn't load dashboard data. Try refreshing the page.
+      <div className="rounded-xl border border-danger-light bg-danger-light/40 p-6 text-danger flex items-center gap-3">
+        <AlertTriangle size={20} />
+        <span>Couldn't load dashboard data. Try refreshing the page.</span>
       </div>
     );
   }
 
+  const stats = data?.stats;
+  const counts = data?.counts;
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-ink-900">Dashboard</h1>
-        <p className="text-sm text-slate-500">Here's how business is looking today.</p>
+      {/* ── Page header ──────────────────────────────────────────────── */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-ink-900">Dashboard</h1>
+          <p className="text-sm text-slate-500">Here's how your business is doing.</p>
+        </div>
+        <PeriodFilter value={period} onChange={setPeriod} />
       </div>
 
+      {/* ── Stat cards row ───────────────────────────────────────────── */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {isLoading || !data ? (
+        {isLoading || !stats ? (
           <>
             <CardSkeleton />
             <CardSkeleton />
@@ -36,79 +85,122 @@ export function DashboardPage() {
         ) : (
           <>
             <StatCard
-              label="Total Revenue"
-              value={formatMoney(data.total_revenue)}
+              label="Purchase Due"
+              value={formatMoney(stats.purchase_due)}
+              icon={ShoppingCart}
+              tone="purple"
+            />
+            <StatCard
+              label="Sales Due"
+              value={formatMoney(stats.sales_due)}
               icon={IndianRupee}
-              tone="brand"
+              tone="red"
             />
             <StatCard
-              label="Pending Invoices"
-              value={String(data.pending_invoices.count)}
-              sublabel={formatMoney(data.pending_invoices.amount) + " outstanding"}
-              icon={Clock}
-              tone="warn"
-            />
-            <StatCard
-              label="Paid Invoices"
-              value={String(data.paid_invoices.count)}
-              icon={CheckCircle2}
-              tone="success"
-            />
-            <StatCard
-              label="This Month"
-              value={formatMoney(data.monthly_sales.at(-1)?.total ?? 0)}
+              label="Sales"
+              value={formatMoney(stats.total_sales)}
               icon={TrendingUp}
-              tone="ink"
+              tone="green"
+            />
+            <StatCard
+              label="Expense"
+              value={formatMoney(stats.expense)}
+              icon={CreditCard}
+              tone="navy"
             />
           </>
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="rounded-xl border border-slate-200 bg-white p-5 lg:col-span-2">
-          <h2 className="mb-1 text-sm font-semibold text-ink-900">Sales, last 6 months</h2>
-          {isLoading || !data ? (
-            <div className="h-64 animate-pulse rounded bg-slate-100" />
-          ) : (
-            <MonthlySalesChart data={data.monthly_sales} />
-          )}
-        </div>
+      {/* ── Count cards row ──────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {isLoading || !counts ? (
+          <>
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+          </>
+        ) : (
+          <>
+            <CountCard
+              label="Customers"
+              count={counts.customers}
+              icon={Users}
+              iconBg="bg-blue-100 text-blue-600"
+              to={hasPermission("customers.view") ? "/customers" : undefined}
+            />
+            <CountCard
+              label="Products"
+              count={counts.products}
+              icon={Package}
+              iconBg="bg-emerald-100 text-emerald-600"
+              to={hasPermission("products.view") ? "/products" : undefined}
+            />
+            <CountCard
+              label="Invoices"
+              count={counts.invoices}
+              icon={FileText}
+              iconBg="bg-amber-100 text-amber-600"
+              to={hasPermission("invoices.view") ? "/invoices" : undefined}
+            />
+            <CountCard
+              label="Paid Invoices"
+              count={counts.paid_invoices}
+              icon={CheckCircle2}
+              iconBg="bg-violet-100 text-violet-600"
+              to={hasPermission("invoices.view") ? "/invoices" : undefined}
+            />
+          </>
+        )}
+      </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-5">
-          <h2 className="mb-3 text-sm font-semibold text-ink-900">Recent transactions</h2>
-          <div className="space-y-3">
-            {isLoading || !data
-              ? Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="h-12 animate-pulse rounded bg-slate-100" />
-                ))
-              : data.recent_transactions.length === 0 ? (
-                  <p className="py-8 text-center text-sm text-slate-400">
-                    No invoices yet. Create your first one to see it here.
-                  </p>
-                ) : (
-                  data.recent_transactions.map((inv) => (
-                    <Link
-                      key={inv.id}
-                      to={`/invoices/${inv.id}`}
-                      className="flex items-center justify-between rounded-lg px-2 py-2 hover:bg-slate-50"
-                    >
-                      <div>
-                        <p className="text-sm font-medium text-ink-900">{inv.invoice_number}</p>
-                        <p className="text-xs text-slate-500">
-                          {inv.customer?.name} · {formatDate(inv.issue_date)}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="figures text-sm font-medium text-ink-900">
-                          {formatMoney(inv.grand_total)}
-                        </p>
-                        <StatusBadge status={inv.status} />
-                      </div>
-                    </Link>
-                  ))
-                )}
+      {/* ── Bar chart + Recent products ───────────────────────────────── */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <Section title="Purchase, Sales & Expense Bar Chart" className="lg:col-span-2">
+          <div className="p-4">
+            {isLoading || !data ? (
+              <div className="h-64 animate-pulse rounded bg-slate-100" />
+            ) : (
+              <SalesBarChart data={data.bar_chart} />
+            )}
           </div>
-        </div>
+        </Section>
+
+        <Section title="Recently Added Items">
+          <RecentProductsTable
+            products={data?.recent_products ?? []}
+            isLoading={isLoading}
+          />
+        </Section>
+      </div>
+
+      {/* ── Stock Alert ───────────────────────────────────────────────── */}
+      <Section title={`Stock Alert (≤ ${data?.low_stock_threshold ?? 5} units)`}>
+        <StockAlertTable
+          items={data?.stock_alert ?? []}
+          threshold={data?.low_stock_threshold ?? 5}
+          isLoading={isLoading}
+        />
+      </Section>
+
+      {/* ── Donut chart + Recent invoices ─────────────────────────────── */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
+        <Section title="Top 10 Trending Items" className="lg:col-span-2">
+          <div className="p-4">
+            <TrendingDonutChart
+              data={data?.top_trending ?? []}
+              isLoading={isLoading}
+            />
+          </div>
+        </Section>
+
+        <Section title="Recent Sales Invoices" className="lg:col-span-3">
+          <RecentInvoicesTable
+            invoices={data?.recent_invoices ?? []}
+            isLoading={isLoading}
+          />
+        </Section>
       </div>
     </div>
   );
