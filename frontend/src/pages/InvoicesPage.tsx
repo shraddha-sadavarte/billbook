@@ -26,7 +26,7 @@ export function InvoicesPage() {
     <div className="space-y-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-ink-900">Invoices</h1>
+          <h1 className="text-2xl font-semibold text-ink-900">Sales</h1>
           <p className="text-sm text-slate-500">{data?.total ?? 0} total</p>
         </div>
         <Link
@@ -34,7 +34,7 @@ export function InvoicesPage() {
           className="flex items-center justify-center gap-1.5 rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark"
         >
           <Plus size={16} />
-          New Invoice
+          New Sale
         </Link>
       </div>
 
@@ -47,7 +47,7 @@ export function InvoicesPage() {
               setSearch(e.target.value);
               setPage(1);
             }}
-            placeholder="Search invoice number…"
+            placeholder="Search sales…"
             className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
           />
         </div>

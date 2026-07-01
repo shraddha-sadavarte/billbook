@@ -16,6 +16,7 @@ PERMISSION_CATALOG = {
     "products": ["view", "create", "edit", "delete"],
     "invoices": ["view", "create", "edit", "delete", "record_payment"],
     "dashboard": ["view"],
+    "advance_payments": ["view", "create", "edit", "delete"],
     "reports": ["view"],
     "settings": ["view", "edit"],
 }

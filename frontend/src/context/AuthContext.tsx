@@ -10,6 +10,7 @@ interface AuthContextValue {
   signup: (payload: authApi.SignupPayload) => Promise<void>;
   logout: () => void;
   hasPermission: (key: string) => boolean;
+  updateCurrentUser: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -48,6 +49,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
+  const updateCurrentUser = (newUser: User) => {
+    setUser(newUser);
+  };
+
   const hasPermission = (key: string) => {
     if (!user) return false;
     if (user.is_super_admin) return true;
@@ -55,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, hasPermission }}>
+    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, hasPermission, updateCurrentUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -4,6 +4,8 @@ from app.models.user import User
 from app.models.customer import Customer
 from app.models.product import Product
 from app.models.invoice import Invoice, InvoiceItem, InvoiceStatus
+from .advance_payment import AdvancePayment, PaymentType, AdvancePaymentStatus
+
 
 __all__ = [
     "Tenant",
@@ -17,4 +19,7 @@ __all__ = [
     "Invoice",
     "InvoiceItem",
     "InvoiceStatus",
+    "AdvancePayment",
+    "PaymentType",
+    "AdvancePaymentStatus",
 ]

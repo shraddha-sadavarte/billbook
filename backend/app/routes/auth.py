@@ -139,3 +139,72 @@ def me():
         ["*"] if user.is_super_admin else []
     )
     return jsonify(data), 200
+
+
+@auth_bp.route("/profile", methods=["PUT"])
+@jwt_required()
+def update_profile():
+    claims = get_jwt()
+    TenantContext.set(claims.get("tenant_id"))
+    from flask_jwt_extended import get_jwt_identity
+
+    user = User.query.get(int(get_jwt_identity()))
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    data = request.get_json(force=True) or {}
+    name = data.get("name", "").strip()
+    email = data.get("email", "").strip()
+    avatar = data.get("avatar")
+
+    if not name:
+        return jsonify({"error": "Name is required"}), 422
+    if not email:
+        return jsonify({"error": "Email is required"}), 422
+
+    duplicate = User.query.filter_by(tenant_id=user.tenant_id, email=email).first()
+    if duplicate and duplicate.id != user.id:
+        return jsonify({"error": "A user with this email already exists"}), 409
+
+    user.name = name
+    user.email = email
+    if "avatar" in data:
+        user.avatar = avatar
+
+    db.session.commit()
+
+    res = user.to_dict()
+    res["permissions"] = list(user.role_ref.permissions) if user.role_ref else (
+        ["*"] if user.is_super_admin else []
+    )
+    return jsonify(res), 200
+
+
+@auth_bp.route("/password", methods=["PUT"])
+@jwt_required()
+def change_password():
+    claims = get_jwt()
+    TenantContext.set(claims.get("tenant_id"))
+    from flask_jwt_extended import get_jwt_identity
+
+    user = User.query.get(int(get_jwt_identity()))
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    data = request.get_json(force=True) or {}
+    current_password = data.get("current_password", "")
+    new_password = data.get("new_password", "")
+
+    if not current_password or not new_password:
+        return jsonify({"error": "Current password and new password are required"}), 422
+
+    if not user.check_password(current_password):
+        return jsonify({"error": "Invalid current password"}), 401
+
+    if len(new_password) < 8:
+        return jsonify({"error": "New password must be at least 8 characters"}), 422
+
+    user.set_password(new_password)
+    db.session.commit()
+
+    return jsonify({"message": "Password updated successfully"}), 200

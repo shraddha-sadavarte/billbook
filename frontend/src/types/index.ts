@@ -21,6 +21,7 @@ export interface User {
   is_super_admin: boolean;
   is_active: boolean;
   created_at?: string;
+  avatar?: string | null;
   // Only present on the /auth/me response, not on list/detail responses
   permissions?: string[];
 }
@@ -166,4 +167,21 @@ export interface AuthResponse {
   tenant?: Tenant;
   access_token: string;
   refresh_token: string;
+}
+
+export type PaymentType = "cash" | "bank" | "cheque" | "online";
+export type AdvancePaymentStatus = "pending" | "applied" | "cancelled";
+
+export interface AdvancePayment {
+  id: number;
+  advance_number: string;
+  customer_id: number;
+  customer?: Customer | null;
+  amount: number;
+  payment_date: string | null;
+  payment_type: PaymentType;
+  reference: string | null;
+  notes: string | null;
+  status: AdvancePaymentStatus;
+  created_at: string;
 }

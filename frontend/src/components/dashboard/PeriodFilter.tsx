@@ -1,4 +1,5 @@
 import type { DashboardPeriod } from "../../api/dashboard";
+import { useTranslation } from "../../context/LanguageContext";
 
 const PERIODS: { key: DashboardPeriod; label: string }[] = [
   { key: "today",   label: "Today" },
@@ -14,6 +15,7 @@ interface PeriodFilterProps {
 }
 
 export function PeriodFilter({ value, onChange }: PeriodFilterProps) {
+  const { t } = useTranslation();
   return (
     <div className="inline-flex rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
       {PERIODS.map(({ key, label }) => (
@@ -26,7 +28,7 @@ export function PeriodFilter({ value, onChange }: PeriodFilterProps) {
               : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
           }`}
         >
-          {label}
+          {t(label)}
         </button>
       ))}
     </div>
