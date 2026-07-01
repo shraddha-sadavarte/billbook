@@ -1,3 +1,6 @@
+import csv
+import io
+
 from flask import Blueprint, request, jsonify, g
 from marshmallow import ValidationError
 
@@ -5,7 +8,7 @@ from app.extensions import db
 from app.models import Product
 from app.schemas import ProductSchema
 from app.tenant_scope import TenantContext
-from app.utils.decorators import require_auth
+from app.utils.decorators import require_auth, require_permission
 
 products_bp = Blueprint("products", __name__, url_prefix="/api/v1/products")
 
@@ -76,3 +79,41 @@ def delete_product(product_id):
     product.is_active = False
     db.session.commit()
     return "", 204
+
+
+@products_bp.route("/import", methods=["POST"])
+@require_auth
+@require_permission("products.import")
+def import_products():
+    if "file" not in request.files:
+        return jsonify({"error": "CSV file is required."}), 400
+
+    file = request.files["file"]
+    if not file or file.filename == "":
+        return jsonify({"error": "CSV file is required."}), 400
+
+    try:
+        content = file.stream.read().decode("utf-8-sig")
+    except Exception:
+        return jsonify({"error": "Unable to read uploaded file."}), 400
+
+    reader = csv.DictReader(io.StringIO(content))
+    imported = []
+    errors = []
+
+    for row_number, row in enumerate(reader, start=2):
+        cleaned = {key: (value.strip() if isinstance(value, str) else value) for key, value in row.items()}
+        try:
+            data = ProductSchema().load(cleaned)
+        except ValidationError as err:
+            errors.append({"row": row_number, "errors": err.messages})
+            continue
+
+        imported.append(Product(tenant_id=TenantContext.get(), **data))
+
+    if errors:
+        return jsonify({"error": "Import failed.", "details": errors}), 422
+
+    db.session.add_all(imported)
+    db.session.commit()
+    return jsonify({"imported": len(imported)}), 201

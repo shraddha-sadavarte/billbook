@@ -43,6 +43,21 @@ class CustomerSchema(Schema):
     gstin = fields.String(load_default=None, allow_none=True)
 
 
+class SupplierSchema(Schema):
+    name = fields.String(required=True, validate=validate.Length(min=1, max=150))
+    mobile = fields.String(load_default=None, allow_none=True)
+    email = fields.Email(load_default=None, allow_none=True)
+    phone = fields.String(load_default=None, allow_none=True)
+    gst_number = fields.String(load_default=None, allow_none=True)
+    tax_number = fields.String(load_default=None, allow_none=True)
+    opening_balance = fields.Decimal(load_default=0, validate=validate.Range(min=0))
+    country = fields.String(load_default=None, allow_none=True)
+    state = fields.String(load_default=None, allow_none=True)
+    city = fields.String(load_default=None, allow_none=True)
+    postcode = fields.String(load_default=None, allow_none=True)
+    address = fields.String(load_default=None, allow_none=True)
+
+
 class ProductSchema(Schema):
     name = fields.String(required=True, validate=validate.Length(min=1, max=150))
     sku = fields.String(load_default=None, allow_none=True)

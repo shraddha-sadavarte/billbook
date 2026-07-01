@@ -1,0 +1,40 @@
+from datetime import datetime
+
+from app.extensions import db
+from app.tenant_scope import TenantScopedMixin
+
+
+class Supplier(TenantScopedMixin, db.Model):
+    __tablename__ = "suppliers"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False)
+    mobile = db.Column(db.String(30))
+    email = db.Column(db.String(120))
+    phone = db.Column(db.String(30))
+    gst_number = db.Column(db.String(50))
+    tax_number = db.Column(db.String(50))
+    opening_balance = db.Column(db.Numeric(12, 2), default=0)
+    country = db.Column(db.String(80))
+    state = db.Column(db.String(80))
+    city = db.Column(db.String(80))
+    postcode = db.Column(db.String(30))
+    address = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "mobile": self.mobile,
+            "email": self.email,
+            "phone": self.phone,
+            "gst_number": self.gst_number,
+            "tax_number": self.tax_number,
+            "opening_balance": float(self.opening_balance or 0),
+            "country": self.country,
+            "state": self.state,
+            "city": self.city,
+            "postcode": self.postcode,
+            "address": self.address,
+        }

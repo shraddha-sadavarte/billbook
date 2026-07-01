@@ -3,7 +3,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token, jwt_re
 from marshmallow import ValidationError
 
 from app.extensions import db
-from app.models import Tenant, User, Role, seed_default_roles
+from app.models import Tenant, User, Role, seed_default_roles, all_permission_keys
 from app.schemas import SignupSchema, LoginSchema
 from app.tenant_scope import TenantContext
 
@@ -19,6 +19,9 @@ def _slugify(name: str) -> str:
 
 def _issue_tokens(user: User) -> dict:
     permissions = list(user.role_ref.permissions) if user.role_ref else []
+    if user.role_ref and user.role_ref.is_system:
+        permissions = all_permission_keys()
+
     claims = {
         "tenant_id": user.tenant_id,
         "is_super_admin": user.is_super_admin,

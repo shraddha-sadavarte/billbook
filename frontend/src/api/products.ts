@@ -34,3 +34,13 @@ export async function updateProduct(id: number, payload: Partial<ProductPayload>
 export async function deleteProduct(id: number) {
   await apiClient.delete(`/products/${id}`);
 }
+
+export async function importProducts(file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const { data } = await apiClient.post<{ imported: number }>("/products/import", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data;
+}

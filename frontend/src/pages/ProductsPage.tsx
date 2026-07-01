@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
-import { Plus, Search, Trash2, Edit2 } from "lucide-react";
-import { useProducts, useCreateProduct, useDeleteProduct, useUpdateProduct } from "../hooks/useProducts";
+import { Plus, Search, Trash2, Edit2, Upload } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { useProducts, useCreateProduct, useDeleteProduct, useImportProducts, useUpdateProduct } from "../hooks/useProducts";
 import { TableSkeleton } from "../components/ui/Skeletons";
 import { Modal } from "../components/ui/Modal";
 import { formatMoney } from "../utils/format";
@@ -34,10 +35,14 @@ export function ProductsPage() {
     unit: "pcs",
   });
 
+  const { hasPermission } = useAuth();
   const { data, isLoading } = useProducts({ page, search });
   const createProduct = useCreateProduct();
   const deleteProduct = useDeleteProduct();
   const updateProduct = useUpdateProduct();
+  const importProducts = useImportProducts();
+  const [file, setFile] = useState<File | null>(null);
+  const canImportProducts = hasPermission("products.import");
 
   const handleCreateSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -87,6 +92,14 @@ export function ProductsPage() {
     if (confirm("Are you sure you want to remove this product....?")) {
       deleteProduct.mutate(id);
     }
+  };
+
+  const handleImportSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    if (!file) return;
+    importProducts.mutate(file, {
+      onSuccess: () => setFile(null),
+    });
   };
 
   return (
@@ -215,6 +228,44 @@ export function ProductsPage() {
           className="w-full max-w-sm rounded-lg border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand shadow-sm"
         />
       </div>
+
+      {canImportProducts ? (
+        <form onSubmit={handleImportSubmit} className="space-y-5 rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-ink-900">Import Products</h2>
+              <p className="text-sm text-slate-500">Upload a CSV file to bulk import products.</p>
+            </div>
+            <button
+              type="submit"
+              disabled={!file || importProducts.isPending}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
+            >
+              <Upload size={16} />
+              {importProducts.isPending ? "Importing…" : "Import products"}
+            </button>
+          </div>
+
+          <label className="rounded-2xl border border-dashed border-slate-300 bg-white p-5 text-center text-sm text-slate-500 hover:border-slate-400 hover:bg-slate-50 cursor-pointer">
+            <input
+              type="file"
+              accept=".csv"
+              className="sr-only"
+              onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+            />
+            <div className="space-y-2">
+              <p className="font-medium text-slate-700">Drag and drop a CSV file here, or click to select a file.</p>
+              <p className="text-xs text-slate-400">Required columns: name, sku, description, unit_price, tax_rate, stock_quantity, unit</p>
+              {file && <p className="text-sm text-slate-600">Selected file: <span className="font-medium">{file.name}</span></p>}
+            </div>
+          </label>
+        </form>
+      ) : (
+        <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-600 shadow-sm">
+          <h2 className="text-lg font-semibold text-ink-900">Import Products</h2>
+          <p className="mt-2">You do not have permission to import products. Contact your administrator to request the <strong>products.import</strong> permission.</p>
+        </div>
+      )}
 
       <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
         <table className="w-full min-w-[760px] text-sm">

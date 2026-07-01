@@ -54,3 +54,15 @@ export function useDeleteCustomer() {
     onError: () => toast.error("Couldn't remove customer."),
   });
 }
+
+export function useImportCustomers() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: customersApi.importCustomers,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
+      toast.success("Customers imported successfully.");
+    },
+    onError: () => toast.error("Couldn't import customers. Check the file and try again."),
+  });
+}

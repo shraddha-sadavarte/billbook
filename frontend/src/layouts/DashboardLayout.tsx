@@ -21,7 +21,7 @@ const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, permission: "dashboard.view" },
   { to: "/sales",     label: "Sales",     icon: Receipt,          permission: "invoices.view" },
   { to: "/invoices",  label: "Invoices",  icon: FileText,        permission: "invoices.view" },
-  { to: "/customers", label: "Customers", icon: Users,            permission: "customers.view" },
+  { to: "/contacts",  label: "Contacts",  icon: Users,            permission: ["customers.view", "suppliers.view"] },
   { to: "/products",  label: "Products",  icon: Package,          permission: "products.view" },
   { to: "/users",     label: "Users",     icon: Users,            permission: "users.view" },
   { to: "/roles",     label: "Roles",     icon: ShieldCheck,      permission: "roles.view" },
@@ -37,7 +37,11 @@ export function DashboardLayout() {
     navigate("/login");
   };
 
-  const visibleNavItems = NAV_ITEMS.filter((item) => hasPermission(item.permission));
+  const visibleNavItems = NAV_ITEMS.filter((item) =>
+    Array.isArray(item.permission)
+      ? item.permission.some((permission) => hasPermission(permission))
+      : hasPermission(item.permission)
+  );
 
   // User initials for avatar
   const initials = user?.name

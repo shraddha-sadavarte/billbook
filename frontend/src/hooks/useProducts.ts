@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { type AxiosError } from "axios";
 import toast from "react-hot-toast";
 import * as productsApi from "../api/products";
 
@@ -44,5 +45,17 @@ export function useDeleteProduct() {
       toast.success("Product removed");
     },
     onError: () => toast.error("Couldn't remove product."),
+  });
+}
+
+export function useImportProducts() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: productsApi.importProducts,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Products imported successfully.");
+    },
+    onError: () => toast.error("Couldn't import products. Check the file and try again."),
   });
 }

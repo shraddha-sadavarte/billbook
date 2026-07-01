@@ -49,6 +49,22 @@ export interface Customer {
   balance: number;
 }
 
+export interface Supplier {
+  id: number;
+  name: string;
+  mobile: string | null;
+  email: string | null;
+  phone: string | null;
+  gst_number: string | null;
+  tax_number: string | null;
+  opening_balance: number;
+  country: string | null;
+  state: string | null;
+  city: string | null;
+  postcode: string | null;
+  address: string | null;
+}
+
 export interface Product {
   id: number;
   name: string;

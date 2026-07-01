@@ -13,7 +13,7 @@ PERMISSION_CATALOG = {
     "roles": ["view", "create", "edit", "delete"],
     "customers": ["view", "create", "edit", "delete", "import"],
     "suppliers": ["view", "create", "edit", "delete", "import"],
-    "products": ["view", "create", "edit", "delete"],
+    "products": ["view", "create", "edit", "delete", "import"],
     "invoices": ["view", "create", "edit", "delete", "record_payment"],
     "dashboard": ["view"],
     "reports": ["view"],

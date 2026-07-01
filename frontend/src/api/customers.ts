@@ -24,6 +24,16 @@ export async function createCustomer(payload: CustomerPayload) {
   return data;
 }
 
+export async function importCustomers(file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const { data } = await apiClient.post<{ imported: number }>("/customers/import", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data;
+}
+
 export async function updateCustomer(id: number, payload: Partial<CustomerPayload>) {
   const { data } = await apiClient.put<Customer>(`/customers/${id}`, payload);
   return data;

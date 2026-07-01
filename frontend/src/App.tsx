@@ -15,6 +15,10 @@ import { SalesReturnsPage } from "./pages/sales/SalesReturnsPage";
 import { InvoiceDetailPage } from "./pages/InvoiceDetailPage";
 import { InvoicesPage } from "./pages/InvoicesPage";
 import { CustomersPage } from "./pages/CustomersPage";
+import { ContactsLayout, ContactsIndexRedirect } from "./pages/contacts/ContactsLayout";
+import { SuppliersPage } from "./pages/contacts/SuppliersPage";
+import { ImportCustomersPage } from "./pages/contacts/ImportCustomersPage";
+import { ImportSuppliersPage } from "./pages/contacts/ImportSuppliersPage";
 import { ProductsPage } from "./pages/ProductsPage";
 import { UsersPage } from "./pages/UsersPage";
 import { RolesPage } from "./pages/RolesPage";
@@ -55,6 +59,13 @@ export default function App() {
               </Route>
               <Route path="/pos" element={<Navigate to="/sales/pos" replace />} />
               <Route path="/invoices" element={<InvoicesPage />} />
+              <Route path="/contacts" element={<ContactsLayout />}>
+                <Route index element={<ContactsIndexRedirect />} />
+                <Route path="customers" element={<CustomersPage />} />
+                <Route path="suppliers" element={<SuppliersPage />} />
+                <Route path="import/customers" element={<ImportCustomersPage />} />
+                <Route path="import/suppliers" element={<ImportSuppliersPage />} />
+              </Route>
               <Route path="/customers" element={<CustomersPage />} />
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/users" element={<UsersPage />} />

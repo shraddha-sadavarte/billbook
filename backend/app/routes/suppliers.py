@@ -5,29 +5,30 @@ from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
 
 from app.extensions import db
-from app.models import Customer
-from app.schemas import CustomerSchema
+from app.models import Supplier
+from app.schemas import SupplierSchema
 from app.tenant_scope import TenantContext
 from app.utils.decorators import require_auth, require_permission
 
-customers_bp = Blueprint("customers", __name__, url_prefix="/api/v1/customers")
+suppliers_bp = Blueprint("suppliers", __name__, url_prefix="/api/v1/suppliers")
 
 
-@customers_bp.route("", methods=["GET"])
+@suppliers_bp.route("", methods=["GET"])
 @require_auth
-def list_customers():
+@require_permission("suppliers.view")
+def list_suppliers():
     page = request.args.get("page", 1, type=int)
     per_page = min(request.args.get("per_page", 20, type=int), 100)
     search = request.args.get("search", "").strip()
 
-    query = Customer.query
+    query = Supplier.query
     if search:
-        query = query.filter(Customer.name.ilike(f"%{search}%"))
+        query = query.filter(Supplier.name.ilike(f"%{search}%"))
 
-    pagination = query.order_by(Customer.name.asc()).paginate(page=page, per_page=per_page, error_out=False)
+    pagination = query.order_by(Supplier.name.asc()).paginate(page=page, per_page=per_page, error_out=False)
     return jsonify(
         {
-            "items": [c.to_dict() for c in pagination.items],
+            "items": [s.to_dict() for s in pagination.items],
             "total": pagination.total,
             "page": page,
             "pages": pagination.pages,
@@ -35,35 +36,33 @@ def list_customers():
     )
 
 
-@customers_bp.route("/<int:customer_id>", methods=["GET"])
+@suppliers_bp.route("/<int:supplier_id>", methods=["GET"])
 @require_auth
-def get_customer(customer_id):
-    customer = Customer.query.get_or_404(customer_id)
-    return jsonify(customer.to_dict())
+@require_permission("suppliers.view")
+def get_supplier(supplier_id):
+    supplier = Supplier.query.get_or_404(supplier_id)
+    return jsonify(supplier.to_dict())
 
 
-@customers_bp.route("", methods=["POST"])
+@suppliers_bp.route("", methods=["POST"])
 @require_auth
-def create_customer():
-    from flask import g
-
+@require_permission("suppliers.create")
+def create_supplier():
     try:
-        data = CustomerSchema().load(request.get_json(force=True) or {})
+        data = SupplierSchema().load(request.get_json(force=True) or {})
     except ValidationError as err:
         return jsonify({"error": "Validation failed", "details": err.messages}), 422
 
-    from app.tenant_scope import TenantContext
-
-    customer = Customer(tenant_id=TenantContext.get(), **data)
-    db.session.add(customer)
+    supplier = Supplier(tenant_id=TenantContext.get(), **data)
+    db.session.add(supplier)
     db.session.commit()
-    return jsonify(customer.to_dict()), 201
+    return jsonify(supplier.to_dict()), 201
 
 
-@customers_bp.route("/import", methods=["POST"])
+@suppliers_bp.route("/import", methods=["POST"])
 @require_auth
-@require_permission("customers.import")
-def import_customers():
+@require_permission("suppliers.import")
+def import_suppliers():
     if "file" not in request.files:
         return jsonify({"error": "CSV file is required."}), 400
 
@@ -83,12 +82,12 @@ def import_customers():
     for row_number, row in enumerate(reader, start=2):
         cleaned = {key: (value.strip() if isinstance(value, str) else value) for key, value in row.items()}
         try:
-            data = CustomerSchema().load(cleaned)
+            data = SupplierSchema().load(cleaned)
         except ValidationError as err:
             errors.append({"row": row_number, "errors": err.messages})
             continue
 
-        imported.append(Customer(tenant_id=TenantContext.get(), **data))
+        imported.append(Supplier(tenant_id=TenantContext.get(), **data))
 
     if errors:
         return jsonify({"error": "Import failed.", "details": errors}), 422
@@ -98,25 +97,27 @@ def import_customers():
     return jsonify({"imported": len(imported)}), 201
 
 
-@customers_bp.route("/<int:customer_id>", methods=["PUT"])
+@suppliers_bp.route("/<int:supplier_id>", methods=["PUT"])
 @require_auth
-def update_customer(customer_id):
-    customer = Customer.query.get_or_404(customer_id)
+@require_permission("suppliers.edit")
+def update_supplier(supplier_id):
+    supplier = Supplier.query.get_or_404(supplier_id)
     try:
-        data = CustomerSchema(partial=True).load(request.get_json(force=True) or {})
+        data = SupplierSchema(partial=True).load(request.get_json(force=True) or {})
     except ValidationError as err:
         return jsonify({"error": "Validation failed", "details": err.messages}), 422
 
     for key, value in data.items():
-        setattr(customer, key, value)
+        setattr(supplier, key, value)
     db.session.commit()
-    return jsonify(customer.to_dict())
+    return jsonify(supplier.to_dict())
 
 
-@customers_bp.route("/<int:customer_id>", methods=["DELETE"])
+@suppliers_bp.route("/<int:supplier_id>", methods=["DELETE"])
 @require_auth
-def delete_customer(customer_id):
-    customer = Customer.query.get_or_404(customer_id)
-    db.session.delete(customer)
+@require_permission("suppliers.delete")
+def delete_supplier(supplier_id):
+    supplier = Supplier.query.get_or_404(supplier_id)
+    db.session.delete(supplier)
     db.session.commit()
     return "", 204
