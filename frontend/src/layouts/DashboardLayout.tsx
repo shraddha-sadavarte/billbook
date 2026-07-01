@@ -31,6 +31,17 @@ import { Modal } from "../components/ui/Modal";
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, permission: "dashboard.view" },
   {
+    label: "Contacts",
+    icon: Users,
+    permission: ["customers.view", "suppliers.view"],
+    sub: [
+      { to: "/contacts/customers", label: "Customers", end: true },
+      { to: "/contacts/suppliers", label: "Suppliers" },
+      { to: "/contacts/import/customers", label: "Import Customers" },
+      { to: "/contacts/import/suppliers", label: "Import Suppliers" },
+    ],
+  },
+  {
     label: "Sales",
     icon: Receipt,
     permission: "invoices.view",
@@ -41,7 +52,6 @@ const NAV_ITEMS = [
       { to: "/sales/returns", label: "Return Sales" },
     ],
   },
-  { to: "/customers", label: "Customers", icon: Users,            permission: "customers.view" },
   { to: "/products",  label: "Products",  icon: Package,          permission: "products.view" },
   { to: "/users",     label: "Users",     icon: Users,            permission: "users.view" },
   { to: "/roles",     label: "Roles",     icon: ShieldCheck,      permission: "roles.view" },
@@ -191,7 +201,9 @@ export function DashboardLayout() {
     }
   };
 
-  const visibleNavItems = NAV_ITEMS.filter((item) => hasPermission(item.permission));
+  const visibleNavItems = NAV_ITEMS.filter((item) =>
+    Array.isArray(item.permission) ? item.permission.some((p) => hasPermission(p)) : hasPermission(item.permission)
+  );
 
   // User initials for avatar fallback
   const initials = user?.name

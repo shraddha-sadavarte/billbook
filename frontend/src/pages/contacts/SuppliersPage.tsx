@@ -1,5 +1,6 @@
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { Plus, Search, Trash2, Edit2 } from "lucide-react";
+import { Country, State, City } from "country-state-city";
 import { useAuth } from "../../context/AuthContext";
 import { useSuppliers, useCreateSupplier, useDeleteSupplier, useUpdateSupplier } from "../../hooks/useSuppliers";
 import { TableSkeleton } from "../../components/ui/Skeletons";
@@ -13,10 +14,6 @@ export function SuppliersPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
 
-  const COUNTRY_OPTIONS = ["India", "United States", "United Kingdom", "Australia", "Canada", "United Arab Emirates"];
-  const STATE_OPTIONS = ["Maharashtra", "Karnataka", "California", "Texas", "New York", "Queensland"];
-  const CITY_OPTIONS = ["Mumbai", "Bengaluru", "Delhi", "New York", "London", "Sydney"];
-
   const defaultForm = {
     name: "",
     mobile: "",
@@ -26,14 +23,82 @@ export function SuppliersPage() {
     tax_number: "",
     opening_balance: 0,
     country: "",
+    country_code: "",
     state: "",
+    state_code: "",
     city: "",
+    city_code: "",
     postcode: "",
     address: "",
   };
 
   const [form, setForm] = useState(defaultForm);
   const [editForm, setEditForm] = useState(defaultForm);
+
+  const countryOptions = useMemo(
+    () => Country.getAllCountries().map((item) => ({ label: item.name, value: item.isoCode })),
+    []
+  );
+
+  const createStateOptions = useMemo(
+    () =>
+      form.country_code
+        ? State.getStatesOfCountry(form.country_code).map((item) => ({ label: item.name, value: item.isoCode }))
+        : [],
+    [form.country_code]
+  );
+
+  const createCityOptions = useMemo(
+    () =>
+      form.country_code && form.state_code
+        ? City.getCitiesOfState(form.country_code, form.state_code).map((item) => ({ label: item.name, value: item.isoCode }))
+        : [],
+    [form.country_code, form.state_code]
+  );
+
+  const editStateOptions = useMemo(
+    () =>
+      editForm.country_code
+        ? State.getStatesOfCountry(editForm.country_code).map((item) => ({ label: item.name, value: item.isoCode }))
+        : [],
+    [editForm.country_code]
+  );
+
+  const editCityOptions = useMemo(
+    () =>
+      editForm.country_code && editForm.state_code
+        ? City.getCitiesOfState(editForm.country_code, editForm.state_code).map((item) => ({ label: item.name, value: item.isoCode }))
+        : [],
+    [editForm.country_code, editForm.state_code]
+  );
+
+  const findCountryCode = (name: string) => countryOptions.find((option) => option.label === name)?.value ?? "";
+
+  const findStateCode = (stateName: string, countryCode: string) =>
+    countryCode
+      ? State.getStatesOfCountry(countryCode).find((item) => item.name === stateName)?.isoCode ?? ""
+      : "";
+
+  const findCityCode = (cityName: string, countryCode: string, stateCode: string) =>
+    countryCode && stateCode
+      ? City.getCitiesOfState(countryCode, stateCode).find((item) => item.name === cityName)?.isoCode ?? ""
+      : "";
+
+  const buildPayload = (payload: typeof defaultForm) => ({
+    name: payload.name,
+    mobile: payload.mobile || null,
+    email: payload.email || null,
+    phone: payload.phone || null,
+    gst_number: payload.gst_number || null,
+    tax_number: payload.tax_number || null,
+    opening_balance: payload.opening_balance || 0,
+    country: payload.country || null,
+    state: payload.state || null,
+    city: payload.city || null,
+    postcode: payload.postcode || null,
+    address: payload.address || null,
+  });
+
 
   const { hasPermission, isLoading: authLoading } = useAuth();
   const canCreateSupplier = hasPermission("suppliers.create");
@@ -47,7 +112,7 @@ export function SuppliersPage() {
 
   const handleCreateSubmit = (e: FormEvent) => {
     e.preventDefault();
-    createSupplier.mutate(form, {
+    createSupplier.mutate(buildPayload(form), {
       onSuccess: () => {
         setForm(defaultForm);
         setShowForm(false);
@@ -56,6 +121,10 @@ export function SuppliersPage() {
   };
 
   const handleEditClick = (supplier: Supplier) => {
+    const country_code = findCountryCode(supplier.country || "");
+    const state_code = findStateCode(supplier.state || "", country_code);
+    const city_code = findCityCode(supplier.city || "", country_code, state_code);
+
     setEditingSupplier(supplier);
     setEditForm({
       name: supplier.name,
@@ -66,8 +135,11 @@ export function SuppliersPage() {
       tax_number: supplier.tax_number || "",
       opening_balance: supplier.opening_balance || 0,
       country: supplier.country || "",
+      country_code,
       state: supplier.state || "",
+      state_code,
       city: supplier.city || "",
+      city_code,
       postcode: supplier.postcode || "",
       address: supplier.address || "",
     });
@@ -76,8 +148,7 @@ export function SuppliersPage() {
   const handleEditSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!editingSupplier) return;
-    updateSupplier.mutate(
-      { id: editingSupplier.id, payload: editForm },
+    updateSupplier.mutate(     { id: editingSupplier.id, payload: buildPayload(editForm) },
       {
         onSuccess: () => {
           setEditingSupplier(null);
@@ -187,32 +258,75 @@ export function SuppliersPage() {
           <div>
             <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Country</label>
             <input
-              list="country-options"
+              list="country-options-create"
               placeholder="Start typing or choose a country"
               value={form.country}
-              onChange={(e) => setForm({ ...form, country: e.target.value })}
+              onChange={(e) => {
+                const country = e.target.value;
+                const country_code = findCountryCode(country);
+                setForm({
+                  ...form,
+                  country,
+                  country_code,
+                  state: "",
+                  state_code: "",
+                  city: "",
+                  city_code: "",
+                });
+              }}
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
             />
+            <datalist id="country-options-create">
+              {countryOptions.map((option) => (
+                <option key={option.value} value={option.label} />
+              ))}
+            </datalist>
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">State</label>
             <input
-              list="state-options"
-              placeholder="Start typing or choose a state"
+              list="state-options-create"
+              placeholder={form.country_code ? "Start typing or choose a state" : "Select country first"}
               value={form.state}
-              onChange={(e) => setForm({ ...form, state: e.target.value })}
-              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
+              disabled={!form.country_code}
+              onChange={(e) => {
+                const state = e.target.value;
+                const state_code = findStateCode(state, form.country_code);
+                setForm({
+                  ...form,
+                  state,
+                  state_code,
+                  city: "",
+                  city_code: "",
+                });
+              }}
+              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand disabled:cursor-not-allowed disabled:bg-slate-50"
             />
+            <datalist id="state-options-create">
+              {createStateOptions.map((option) => (
+                <option key={option.value} value={option.label} />
+              ))}
+            </datalist>
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">City</label>
             <input
-              list="city-options"
-              placeholder="Start typing or choose a city"
+              list="city-options-create"
+              placeholder={form.state_code ? "Start typing or choose a city" : "Select state first"}
               value={form.city}
-              onChange={(e) => setForm({ ...form, city: e.target.value })}
-              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
+              disabled={!form.state_code}
+              onChange={(e) => {
+                const city = e.target.value;
+                const city_code = findCityCode(city, form.country_code, form.state_code);
+                setForm({ ...form, city, city_code });
+              }}
+              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand disabled:cursor-not-allowed disabled:bg-slate-50"
             />
+            <datalist id="city-options-create">
+              {createCityOptions.map((option) => (
+                <option key={option.value} value={option.label} />
+              ))}
+            </datalist>
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Postcode</label>
@@ -423,32 +537,75 @@ export function SuppliersPage() {
           <div>
             <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Country</label>
             <input
-              list="country-options"
+              list="country-options-edit"
               placeholder="Start typing or choose a country"
               value={editForm.country}
-              onChange={(e) => setEditForm({ ...editForm, country: e.target.value })}
+              onChange={(e) => {
+                const country = e.target.value;
+                const country_code = findCountryCode(country);
+                setEditForm({
+                  ...editForm,
+                  country,
+                  country_code,
+                  state: "",
+                  state_code: "",
+                  city: "",
+                  city_code: "",
+                });
+              }}
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
             />
+            <datalist id="country-options-edit">
+              {countryOptions.map((option) => (
+                <option key={option.value} value={option.label} />
+              ))}
+            </datalist>
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">State</label>
             <input
-              list="state-options"
-              placeholder="Start typing or choose a state"
+              list="state-options-edit"
+              placeholder={editForm.country_code ? "Start typing or choose a state" : "Select country first"}
               value={editForm.state}
-              onChange={(e) => setEditForm({ ...editForm, state: e.target.value })}
-              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
+              disabled={!editForm.country_code}
+              onChange={(e) => {
+                const state = e.target.value;
+                const state_code = findStateCode(state, editForm.country_code);
+                setEditForm({
+                  ...editForm,
+                  state,
+                  state_code,
+                  city: "",
+                  city_code: "",
+                });
+              }}
+              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand disabled:cursor-not-allowed disabled:bg-slate-50"
             />
+            <datalist id="state-options-edit">
+              {editStateOptions.map((option) => (
+                <option key={option.value} value={option.label} />
+              ))}
+            </datalist>
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">City</label>
             <input
-              list="city-options"
-              placeholder="Start typing or choose a city"
+              list="city-options-edit"
+              placeholder={editForm.state_code ? "Start typing or choose a city" : "Select state first"}
               value={editForm.city}
-              onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
-              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
+              disabled={!editForm.state_code}
+              onChange={(e) => {
+                const city = e.target.value;
+                const city_code = findCityCode(city, editForm.country_code, editForm.state_code);
+                setEditForm({ ...editForm, city, city_code });
+              }}
+              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand disabled:cursor-not-allowed disabled:bg-slate-50"
             />
+            <datalist id="city-options-edit">
+              {editCityOptions.map((option) => (
+                <option key={option.value} value={option.label} />
+              ))}
+            </datalist>
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Postcode</label>
@@ -487,3 +644,4 @@ export function SuppliersPage() {
     </div>
   );
 }
+
