@@ -32,6 +32,7 @@ class User(TenantScopedMixin, db.Model):
     name = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), nullable=False, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
+    avatar = db.Column(db.Text, nullable=True)
 
     # True only for SaaS-owner accounts; bypasses tenant scoping and the
     # Role permission system entirely (checked first in has_permission()).
@@ -65,4 +66,5 @@ class User(TenantScopedMixin, db.Model):
             "is_super_admin": self.is_super_admin,
             "is_active": self.is_active,
             "created_at": self.created_at.isoformat() if self.created_at else None,
+            "avatar": self.avatar,
         }

@@ -43,6 +43,7 @@ def create_app(config_name: str | None = None) -> Flask:
     from app.routes.dashboard import dashboard_bp
     from app.routes.roles import roles_bp
     from app.routes.users import users_bp
+    from app.routes.advance_payments import advance_payments_bp
 
     flask_app.register_blueprint(auth_bp)
     flask_app.register_blueprint(customers_bp)
@@ -52,6 +53,7 @@ def create_app(config_name: str | None = None) -> Flask:
     flask_app.register_blueprint(dashboard_bp)
     flask_app.register_blueprint(roles_bp)
     flask_app.register_blueprint(users_bp)
+    flask_app.register_blueprint(advance_payments_bp)
 
     @flask_app.route("/api/v1/health", methods=["GET"])
     def health():

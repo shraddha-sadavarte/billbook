@@ -70,7 +70,7 @@ export function InvoiceDetailPage() {
       <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
         <Link to="/invoices" className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-ink-900 transition-colors">
           <ArrowLeft size={16} />
-          Back to invoices
+          Back to sales
         </Link>
         <div className="flex flex-wrap items-center gap-2">
           {/* Status Change Dropdown */}

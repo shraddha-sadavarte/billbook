@@ -23,6 +23,7 @@ import { RecentInvoicesTable } from "../components/dashboard/RecentInvoicesTable
 import { CardSkeleton } from "../components/ui/Skeletons";
 import { formatMoney } from "../utils/format";
 import { useAuth } from "../context/AuthContext";
+import { useTranslation } from "../context/LanguageContext";
 
 // ── Section card wrapper ─────────────────────────────────────────────────────
 function Section({
@@ -49,6 +50,7 @@ export function DashboardPage() {
   const [period, setPeriod] = useState<DashboardPeriod>("all");
   const { data, isLoading, isError } = useDashboardSummary(period);
   const { hasPermission } = useAuth();
+  const { t } = useTranslation();
 
   if (isError) {
     return (
@@ -67,8 +69,8 @@ export function DashboardPage() {
       {/* ── Page header ──────────────────────────────────────────────── */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-ink-900">Dashboard</h1>
-          <p className="text-sm text-slate-500">Here's how your business is doing.</p>
+          <h1 className="text-2xl font-semibold text-ink-900">{t("Dashboard")}</h1>
+          <p className="text-sm text-slate-500">{t("Overview of your business performance")}</p>
         </div>
         <PeriodFilter value={period} onChange={setPeriod} />
       </div>
@@ -85,25 +87,25 @@ export function DashboardPage() {
         ) : (
           <>
             <StatCard
-              label="Purchase Due"
+              label={t("Purchase Due")}
               value={formatMoney(stats.purchase_due)}
               icon={ShoppingCart}
               tone="purple"
             />
             <StatCard
-              label="Sales Due"
+              label={t("Sales Due")}
               value={formatMoney(stats.sales_due)}
               icon={IndianRupee}
               tone="red"
             />
             <StatCard
-              label="Sales"
+              label={t("Sales")}
               value={formatMoney(stats.total_sales)}
               icon={TrendingUp}
               tone="green"
             />
             <StatCard
-              label="Expense"
+              label={t("Expense")}
               value={formatMoney(stats.expense)}
               icon={CreditCard}
               tone="navy"
@@ -124,28 +126,28 @@ export function DashboardPage() {
         ) : (
           <>
             <CountCard
-              label="Customers"
+              label={t("Customers")}
               count={counts.customers}
               icon={Users}
               iconBg="bg-blue-100 text-blue-600"
               to={hasPermission("customers.view") ? "/customers" : undefined}
             />
             <CountCard
-              label="Products"
+              label={t("Products")}
               count={counts.products}
               icon={Package}
               iconBg="bg-emerald-100 text-emerald-600"
               to={hasPermission("products.view") ? "/products" : undefined}
             />
             <CountCard
-              label="Invoices"
+              label={t("Invoices")}
               count={counts.invoices}
               icon={FileText}
               iconBg="bg-amber-100 text-amber-600"
               to={hasPermission("invoices.view") ? "/invoices" : undefined}
             />
             <CountCard
-              label="Paid Invoices"
+              label={t("Paid Invoices")}
               count={counts.paid_invoices}
               icon={CheckCircle2}
               iconBg="bg-violet-100 text-violet-600"
@@ -157,7 +159,7 @@ export function DashboardPage() {
 
       {/* ── Bar chart + Recent products ───────────────────────────────── */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <Section title="Purchase, Sales & Expense Bar Chart" className="lg:col-span-2">
+        <Section title={t("Purchase, Sales & Expense Bar Chart")} className="lg:col-span-2">
           <div className="p-4">
             {isLoading || !data ? (
               <div className="h-64 animate-pulse rounded bg-slate-100" />
@@ -167,7 +169,7 @@ export function DashboardPage() {
           </div>
         </Section>
 
-        <Section title="Recently Added Items">
+        <Section title={t("Recent Products")}>
           <RecentProductsTable
             products={data?.recent_products ?? []}
             isLoading={isLoading}
@@ -176,7 +178,7 @@ export function DashboardPage() {
       </div>
 
       {/* ── Stock Alert ───────────────────────────────────────────────── */}
-      <Section title={`Stock Alert (≤ ${data?.low_stock_threshold ?? 5} units)`}>
+      <Section title={`${t("Stock Alert")} (≤ ${data?.low_stock_threshold ?? 5} ${t("Unit Price")})`}>
         <StockAlertTable
           items={data?.stock_alert ?? []}
           threshold={data?.low_stock_threshold ?? 5}
@@ -186,7 +188,7 @@ export function DashboardPage() {
 
       {/* ── Donut chart + Recent invoices ─────────────────────────────── */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
-        <Section title="Top 10 Trending Items" className="lg:col-span-2">
+        <Section title={t("Trending Items")} className="lg:col-span-2">
           <div className="p-4">
             <TrendingDonutChart
               data={data?.top_trending ?? []}
@@ -195,7 +197,7 @@ export function DashboardPage() {
           </div>
         </Section>
 
-        <Section title="Recent Sales Invoices" className="lg:col-span-3">
+        <Section title={t("Recent Sales Invoices")} className="lg:col-span-3">
           <RecentInvoicesTable
             invoices={data?.recent_invoices ?? []}
             isLoading={isLoading}

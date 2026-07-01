@@ -34,3 +34,24 @@ export async function fetchCurrentUser(): Promise<User> {
 export function logout() {
   tokenStorage.clear();
 }
+
+export interface UpdateProfilePayload {
+  name: string;
+  email: string;
+  avatar?: string | null;
+}
+
+export async function updateProfile(payload: UpdateProfilePayload): Promise<User> {
+  const { data } = await apiClient.put<User>("/auth/profile", payload);
+  return data;
+}
+
+export interface ChangePasswordPayload {
+  current_password?: string;
+  new_password?: string;
+}
+
+export async function changePassword(payload: ChangePasswordPayload): Promise<{ message: string }> {
+  const { data } = await apiClient.put<{ message: string }>("/auth/password", payload);
+  return data;
+}
