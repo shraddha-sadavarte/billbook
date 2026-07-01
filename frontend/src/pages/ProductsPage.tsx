@@ -6,14 +6,15 @@ import { TableSkeleton } from "../components/ui/Skeletons";
 import { Modal } from "../components/ui/Modal";
 import { formatMoney } from "../utils/format";
 import type { Product } from "../types";
+import { useTranslation } from "../context/LanguageContext";
 
 export function ProductsPage() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
-  // Form states for creating
   const [form, setForm] = useState({
     name: "",
     sku: "",
@@ -23,8 +24,6 @@ export function ProductsPage() {
     stock_quantity: 0,
     unit: "pcs",
   });
-
-  // Form states for editing
   const [editForm, setEditForm] = useState({
     name: "",
     sku: "",
@@ -81,15 +80,13 @@ export function ProductsPage() {
     updateProduct.mutate(
       { id: editingProduct.id, payload: editForm },
       {
-        onSuccess: () => {
-          setEditingProduct(null);
-        },
+        onSuccess: () => setEditingProduct(null),
       }
     );
   };
 
   const handleDelete = (id: number) => {
-    if (confirm("Are you sure you want to remove this product....?")) {
+    if (confirm(t("Are you sure you want to remove this product?"))) {
       deleteProduct.mutate(id);
     }
   };
@@ -106,15 +103,15 @@ export function ProductsPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-ink-900">Products</h1>
-          <p className="text-sm text-slate-500">{data?.total ?? 0} total</p>
+          <h1 className="text-2xl font-semibold text-ink-900">{t("Products")}</h1>
+          <p className="text-sm text-slate-500">{data?.total ?? 0} {t("total")}</p>
         </div>
         <button
           onClick={() => setShowForm((v) => !v)}
           className="flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark shadow-sm"
         >
           <Plus size={16} />
-          Add Product
+          {t("Add Product")}
         </button>
       </div>
 
@@ -124,26 +121,26 @@ export function ProductsPage() {
           className="grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-white p-6 sm:grid-cols-4 shadow-sm"
         >
           <div className="sm:col-span-2">
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Product Name</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Product Name")}</label>
             <input
               required
-              placeholder="e.g. Wireless Mouse"
+              placeholder={t("e.g. Wireless Mouse")}
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">SKU</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("SKU")}</label>
             <input
-              placeholder="e.g. TECH-MSE-01"
+              placeholder={t("e.g. TECH-MSE-01")}
               value={form.sku}
               onChange={(e) => setForm({ ...form, sku: e.target.value })}
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Unit Price (₹)</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Unit Price")}</label>
             <input
               type="number"
               min={0}
@@ -156,42 +153,42 @@ export function ProductsPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Tax Rate (%)</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Tax Rate")}</label>
             <input
               type="number"
               min={0}
               max={100}
               step="0.01"
-              placeholder="e.g. 18"
+              placeholder={t("e.g. 18")}
               value={form.tax_rate || ""}
               onChange={(e) => setForm({ ...form, tax_rate: Number(e.target.value) || 0 })}
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Stock Qty</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Stock Qty")}</label>
             <input
               type="number"
               min={0}
-              placeholder="e.g. 100"
+              placeholder={t("e.g. 100")}
               value={form.stock_quantity || ""}
               onChange={(e) => setForm({ ...form, stock_quantity: Number(e.target.value) || 0 })}
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Unit</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Unit")}</label>
             <input
-              placeholder="e.g. pcs, box, kg"
+              placeholder={t("e.g. pcs, box, kg")}
               value={form.unit}
               onChange={(e) => setForm({ ...form, unit: e.target.value })}
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
             />
           </div>
           <div className="sm:col-span-4">
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Description</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Description")}</label>
             <textarea
-              placeholder="Add product specifications or notes..."
+              placeholder={t("Add product specifications or notes...")}
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand h-20 resize-none"
@@ -203,14 +200,14 @@ export function ProductsPage() {
               onClick={() => setShowForm(false)}
               className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
             >
-              Cancel
+              {t("Cancel")}
             </button>
             <button
               type="submit"
               disabled={createProduct.isPending}
               className="rounded-lg bg-brand px-5 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
             >
-              {createProduct.isPending ? "Saving…" : "Save Product"}
+              {createProduct.isPending ? t("Saving…") : t("Save Product")}
             </button>
           </div>
         </form>
@@ -224,7 +221,7 @@ export function ProductsPage() {
             setSearch(e.target.value);
             setPage(1);
           }}
-          placeholder="Search products by name…"
+          placeholder={t("Search products by name…")}
           className="w-full max-w-sm rounded-lg border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand shadow-sm"
         />
       </div>
@@ -233,8 +230,8 @@ export function ProductsPage() {
         <form onSubmit={handleImportSubmit} className="space-y-5 rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-ink-900">Import Products</h2>
-              <p className="text-sm text-slate-500">Upload a CSV file to bulk import products.</p>
+              <h2 className="text-lg font-semibold text-ink-900">{t("Import Products")}</h2>
+              <p className="text-sm text-slate-500">{t("Upload a CSV file to bulk import products.")}</p>
             </div>
             <button
               type="submit"
@@ -242,10 +239,9 @@ export function ProductsPage() {
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
             >
               <Upload size={16} />
-              {importProducts.isPending ? "Importing…" : "Import products"}
+              {importProducts.isPending ? t("Importing…") : t("Import products")}
             </button>
           </div>
-
           <label className="rounded-2xl border border-dashed border-slate-300 bg-white p-5 text-center text-sm text-slate-500 hover:border-slate-400 hover:bg-slate-50 cursor-pointer">
             <input
               type="file"
@@ -254,16 +250,22 @@ export function ProductsPage() {
               onChange={(event) => setFile(event.target.files?.[0] ?? null)}
             />
             <div className="space-y-2">
-              <p className="font-medium text-slate-700">Drag and drop a CSV file here, or click to select a file.</p>
-              <p className="text-xs text-slate-400">Required columns: name, sku, description, unit_price, tax_rate, stock_quantity, unit</p>
-              {file && <p className="text-sm text-slate-600">Selected file: <span className="font-medium">{file.name}</span></p>}
+              <p className="font-medium text-slate-700">{t("Drag and drop a CSV file here, or click to select a file.")}</p>
+              <p className="text-xs text-slate-400">
+                {t("Required columns: name, sku, description, unit_price, tax_rate, stock_quantity, unit")}
+              </p>
+              {file && (
+                <p className="text-sm text-slate-600">
+                  {t("Selected file:")} <span className="font-medium">{file.name}</span>
+                </p>
+              )}
             </div>
           </label>
         </form>
       ) : (
         <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-600 shadow-sm">
-          <h2 className="text-lg font-semibold text-ink-900">Import Products</h2>
-          <p className="mt-2">You do not have permission to import products. Contact your administrator to request the <strong>products.import</strong> permission.</p>
+          <h2 className="text-lg font-semibold text-ink-900">{t("Import Products")}</h2>
+          <p className="mt-2">{t("You do not have permission to import products. Contact your administrator to request the products.import permission.")}</p>
         </div>
       )}
 
@@ -271,12 +273,12 @@ export function ProductsPage() {
         <table className="w-full min-w-[760px] text-sm">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs font-medium text-slate-500">
-              <th className="px-4 py-3">SKU</th>
-              <th className="px-4 py-3">Product Name</th>
-              <th className="px-4 py-3 text-right">Unit Price</th>
-              <th className="px-4 py-3 text-right">Tax Rate</th>
-              <th className="px-4 py-3 text-right">Stock Status</th>
-              <th className="w-24 px-4 py-3 text-center">Actions</th>
+              <th className="px-4 py-3">{t("SKU")}</th>
+              <th className="px-4 py-3">{t("Product Name")}</th>
+              <th className="px-4 py-3 text-right">{t("Unit Price")}</th>
+              <th className="px-4 py-3 text-right">{t("Tax Rate")}</th>
+              <th className="px-4 py-3 text-right">{t("Stock Status")}</th>
+              <th className="w-24 px-4 py-3 text-center">{t("Actions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -285,7 +287,7 @@ export function ProductsPage() {
             ) : data?.items.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-10 text-center text-sm text-slate-400">
-                  No products found matching your search.
+                  {t("No products found matching your search.")}
                 </td>
               </tr>
             ) : (
@@ -316,14 +318,14 @@ export function ProductsPage() {
                       <button
                         onClick={() => handleEditClick(p)}
                         className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-ink-900 transition-colors"
-                        aria-label="Edit product"
+                        aria-label={t("Edit product")}
                       >
                         <Edit2 size={14} />
                       </button>
                       <button
                         onClick={() => handleDelete(p.id)}
                         className="rounded-md p-1.5 text-slate-400 hover:bg-danger-light hover:text-danger transition-colors"
-                        aria-label="Delete product"
+                        aria-label={t("Delete product")}
                       >
                         <Trash2 size={14} />
                       </button>
@@ -343,30 +345,29 @@ export function ProductsPage() {
             onClick={() => setPage((p) => p - 1)}
             className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 disabled:opacity-40 hover:bg-slate-50 transition-colors"
           >
-            Previous
+            {t("Previous")}
           </button>
           <span className="text-sm text-slate-500">
-            Page {data.page} of {data.pages}
+            {t("Page")} {data.page} {t("of")} {data.pages}
           </span>
           <button
             disabled={page >= data.pages}
             onClick={() => setPage((p) => p + 1)}
             className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 disabled:opacity-40 hover:bg-slate-50 transition-colors"
           >
-            Next
+            {t("Next")}
           </button>
         </div>
       )}
 
-      {/* ── Edit Product Modal ───────────────────────────────────────── */}
       <Modal
         isOpen={editingProduct !== null}
         onClose={() => setEditingProduct(null)}
-        title="Edit Product"
+        title={t("Edit Product")}
       >
         <form onSubmit={handleEditSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Product Name</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Product Name")}</label>
             <input
               required
               value={editForm.name}
@@ -376,7 +377,7 @@ export function ProductsPage() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">SKU</label>
+              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("SKU")}</label>
               <input
                 value={editForm.sku}
                 onChange={(e) => setEditForm({ ...editForm, sku: e.target.value })}
@@ -384,7 +385,7 @@ export function ProductsPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Unit</label>
+              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Unit")}</label>
               <input
                 value={editForm.unit}
                 onChange={(e) => setEditForm({ ...editForm, unit: e.target.value })}
@@ -394,7 +395,7 @@ export function ProductsPage() {
           </div>
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Unit Price</label>
+              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Unit Price")}</label>
               <input
                 type="number"
                 min={0}
@@ -406,7 +407,7 @@ export function ProductsPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Tax Rate (%)</label>
+              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Tax Rate")}</label>
               <input
                 type="number"
                 min={0}
@@ -418,7 +419,7 @@ export function ProductsPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Stock Qty</label>
+              <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Stock Qty")}</label>
               <input
                 type="number"
                 min={0}
@@ -429,7 +430,7 @@ export function ProductsPage() {
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Description</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Description")}</label>
             <textarea
               value={editForm.description}
               onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
@@ -442,14 +443,14 @@ export function ProductsPage() {
               onClick={() => setEditingProduct(null)}
               className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
             >
-              Cancel
+              {t("Cancel")}
             </button>
             <button
               type="submit"
               disabled={updateProduct.isPending}
               className="rounded-lg bg-brand px-5 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
             >
-              {updateProduct.isPending ? "Saving…" : "Save Changes"}
+              {updateProduct.isPending ? t("Saving…") : t("Save Changes")}
             </button>
           </div>
         </form>

@@ -63,11 +63,32 @@ def exempt_from_tenant_scoping(model_cls):
     return model_cls
 
 
+_TABLE_TO_MODEL = {}
+
+def _get_table_to_model():
+    if not _TABLE_TO_MODEL:
+        from app.extensions import db
+        # Build mapping from table name to model class dynamically
+        registry = db.Model.registry
+        for mapper in registry.mappers:
+            for table in mapper.tables:
+                _TABLE_TO_MODEL[table.name] = mapper.class_
+    return _TABLE_TO_MODEL
+
+def _get_statement_tables(stmt):
+    from sqlalchemy.sql.visitors import traverse
+    tables = set()
+    def visit_table(table):
+        tables.add(table)
+    traverse(stmt, {}, {"table": visit_table})
+    return tables
+
+
 @event.listens_for(Session, "do_orm_execute")
 def _enforce_tenant_scoping(execute_state):
     """
-    Fires on every ORM SELECT/UPDATE/DELETE. If the target model is
-    tenant-scoped and a tenant is active on this request, inject the filter.
+    Fires on every ORM SELECT/UPDATE/DELETE. If the query references tables
+    that are tenant-scoped and a tenant is active, inject the tenant filters.
     """
     if not execute_state.is_select and not execute_state.is_update and not execute_state.is_delete:
         return
@@ -83,11 +104,16 @@ def _enforce_tenant_scoping(execute_state):
         # Those routes query by other keys (email, etc.) and don't need scoping.
         return
 
-    for desc in execute_state.statement.column_descriptions:
-        entity = desc.get("entity")
-        if entity is None or entity in _EXEMPT_MODELS:
-            continue
-        if issubclass(entity, TenantScopedMixin):
-            execute_state.statement = execute_state.statement.where(
-                entity.tenant_id == tenant_id
-            )
+    stmt = execute_state.statement
+    tables = _get_statement_tables(stmt)
+    table_to_model = _get_table_to_model()
+
+    for table in tables:
+        model_cls = table_to_model.get(table.name)
+        if model_cls and issubclass(model_cls, TenantScopedMixin):
+            if model_cls in _EXEMPT_MODELS:
+                continue
+            stmt = stmt.where(table.c.tenant_id == tenant_id)
+
+    execute_state.statement = stmt
+

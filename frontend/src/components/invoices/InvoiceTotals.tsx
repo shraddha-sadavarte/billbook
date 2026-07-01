@@ -1,5 +1,6 @@
 import type { InvoiceItem } from "../../types";
 import { formatMoney } from "../../utils/format";
+import { useTranslation } from "../../context/LanguageContext";
 
 interface InvoiceTotalsProps {
   items: InvoiceItem[];
@@ -21,6 +22,8 @@ export function InvoiceTotals({
   onDiscountTypeChange,
   onDiscountValueChange,
 }: InvoiceTotalsProps) {
+  const { t } = useTranslation();
+
   const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unit_price, 0);
   const taxTotal = items.reduce(
     (sum, item) => sum + item.quantity * item.unit_price * (item.tax_rate / 100),
@@ -34,16 +37,16 @@ export function InvoiceTotals({
     <div className="rounded-xl border border-slate-200 bg-white p-5">
       <div className="space-y-3">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-slate-500">Subtotal</span>
+          <span className="text-slate-500">{t("Subtotal")}</span>
           <span className="figures font-medium text-ink-900">{formatMoney(subtotal)}</span>
         </div>
         <div className="flex items-center justify-between text-sm">
-          <span className="text-slate-500">Tax</span>
+          <span className="text-slate-500">{t("Tax")}</span>
           <span className="figures font-medium text-ink-900">{formatMoney(taxTotal)}</span>
         </div>
 
         <div className="flex items-center justify-between gap-2 text-sm">
-          <span className="text-slate-500">Discount</span>
+          <span className="text-slate-500">{t("Discount")}</span>
           <div className="flex items-center gap-1.5">
             <select
               value={discountType}
@@ -60,12 +63,13 @@ export function InvoiceTotals({
               value={discountValue}
               onChange={(e) => onDiscountValueChange(Number(e.target.value) || 0)}
               className="figures w-20 rounded-md border border-slate-200 px-2 py-1 text-right text-sm"
+              placeholder={t("Discount value")}
             />
           </div>
         </div>
 
         <div className="flex items-center justify-between border-t border-slate-100 pt-3 text-base">
-          <span className="font-semibold text-ink-900">Total</span>
+          <span className="font-semibold text-ink-900">{t("Total")}</span>
           <span className="figures font-semibold text-ink-900">{formatMoney(grandTotal)}</span>
         </div>
       </div>

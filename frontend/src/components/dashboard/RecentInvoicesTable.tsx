@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import type { Invoice } from "../../types";
 import { StatusBadge } from "../ui/StatusBadge";
 import { formatMoney, formatDate } from "../../utils/format";
+import { useTranslation } from "../../context/LanguageContext";
 
 interface RecentInvoicesTableProps {
   invoices: Invoice[];
@@ -9,6 +10,8 @@ interface RecentInvoicesTableProps {
 }
 
 export function RecentInvoicesTable({ invoices, isLoading }: RecentInvoicesTableProps) {
+  const { t } = useTranslation();
+
   if (isLoading) {
     return (
       <div className="space-y-2 p-4">
@@ -22,7 +25,7 @@ export function RecentInvoicesTable({ invoices, isLoading }: RecentInvoicesTable
   if (invoices.length === 0) {
     return (
       <p className="py-10 text-center text-sm text-slate-400">
-        No invoices yet. Create your first invoice.
+        {t("No invoices yet. Create your first invoice.")}
       </p>
     );
   }
@@ -38,7 +41,7 @@ export function RecentInvoicesTable({ invoices, isLoading }: RecentInvoicesTable
                   key={h}
                   className="whitespace-nowrap px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500"
                 >
-                  {h}
+                  {t(h)}
                 </th>
               )
             )}

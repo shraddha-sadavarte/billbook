@@ -6,8 +6,10 @@ import { Modal } from "../components/ui/Modal";
 import { TableSkeleton } from "../components/ui/Skeletons";
 import { useAuth } from "../context/AuthContext";
 import { formatDate } from "../utils/format";
+import { useTranslation } from "../context/LanguageContext";
 
 export function UsersPage() {
+  const { t } = useTranslation();
   const { user: currentUser, hasPermission } = useAuth();
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -44,8 +46,8 @@ export function UsersPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-ink-900">Users</h1>
-          <p className="text-sm text-slate-500">{data?.total ?? 0} total</p>
+          <h1 className="text-2xl font-semibold text-ink-900">{t("Users")}</h1>
+          <p className="text-sm text-slate-500">{data?.total ?? 0} {t("total")}</p>
         </div>
         {hasPermission("users.create") && (
           <button
@@ -53,7 +55,7 @@ export function UsersPage() {
             className="flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark"
           >
             <Plus size={16} />
-            Add User
+            {t("Add User")}
           </button>
         )}
       </div>
@@ -63,7 +65,7 @@ export function UsersPage() {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search users…"
+          placeholder={t("Search users…")}
           className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
         />
       </div>
@@ -72,11 +74,11 @@ export function UsersPage() {
         <table className="w-full min-w-[680px] text-sm">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs font-medium text-slate-500">
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3">Role</th>
-              <th className="px-4 py-3">Joined</th>
-              <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">{t("Name")}</th>
+              <th className="px-4 py-3">{t("Email")}</th>
+              <th className="px-4 py-3">{t("Role")}</th>
+              <th className="px-4 py-3">{t("Joined")}</th>
+              <th className="px-4 py-3">{t("Status")}</th>
               <th className="w-10 px-4 py-3" />
             </tr>
           </thead>
@@ -86,7 +88,7 @@ export function UsersPage() {
             ) : data?.items.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-10 text-center text-sm text-slate-400">
-                  No users yet.
+                  {t("No users yet.")}
                 </td>
               </tr>
             ) : (
@@ -123,7 +125,7 @@ export function UsersPage() {
                         u.is_active ? "bg-success-light text-success" : "bg-slate-100 text-slate-500"
                       }`}
                     >
-                      {u.is_active ? "Active" : "Inactive"}
+                      {u.is_active ? t("Active") : t("Inactive")}
                     </button>
                   </td>
                   <td className="px-4 py-3 text-center">
@@ -131,7 +133,7 @@ export function UsersPage() {
                       <button
                         onClick={() => deleteUser.mutate(u.id)}
                         className="rounded-md p-1.5 text-slate-400 hover:bg-danger-light hover:text-danger"
-                        aria-label="Delete user"
+                        aria-label={t("Delete user")}
                       >
                         <Trash2 size={15} />
                       </button>
@@ -144,10 +146,10 @@ export function UsersPage() {
         </table>
       </div>
 
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Add user">
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={t("Add user")}>
         <div className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-500">Name</label>
+            <label className="mb-1.5 block text-xs font-medium text-slate-500">{t("Name")}</label>
             <input
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -155,7 +157,7 @@ export function UsersPage() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-500">Email</label>
+            <label className="mb-1.5 block text-xs font-medium text-slate-500">{t("Email")}</label>
             <input
               type="email"
               value={form.email}
@@ -164,7 +166,7 @@ export function UsersPage() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-500">Password</label>
+            <label className="mb-1.5 block text-xs font-medium text-slate-500">{t("Password")}</label>
             <input
               type="password"
               minLength={8}
@@ -174,7 +176,7 @@ export function UsersPage() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-500">Role</label>
+            <label className="mb-1.5 block text-xs font-medium text-slate-500">{t("Role")}</label>
             <select
               value={form.role_id}
               onChange={(e) => setForm({ ...form, role_id: e.target.value })}
@@ -192,7 +194,7 @@ export function UsersPage() {
             disabled={!form.name || !form.email || form.password.length < 8 || createUser.isPending}
             className="w-full rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
           >
-            {createUser.isPending ? "Adding…" : "Add user"}
+            {createUser.isPending ? t("Adding…") : t("Add user")}
           </button>
         </div>
       </Modal>

@@ -64,7 +64,7 @@ def summary():
     # 2. COUNT CARDS
     # ------------------------------------------------------------------
     customer_count = Customer.query.count()
-    product_count = Product.query.count()
+    product_count = Product.query.filter_by(is_active=True).count()
 
     invoice_count_q = Invoice.query
     if period_filter is not None:
@@ -221,6 +221,7 @@ def summary():
             InvoiceItem.description.label("name"),
             func.coalesce(func.sum(InvoiceItem.quantity), 0).label("total_qty"),
         )
+        .join(Invoice, InvoiceItem.invoice_id == Invoice.id)
         .group_by(InvoiceItem.description)
         .order_by(func.sum(InvoiceItem.quantity).desc())
         .limit(10)

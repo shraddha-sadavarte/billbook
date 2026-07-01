@@ -56,7 +56,7 @@ export function DashboardPage() {
     return (
       <div className="rounded-xl border border-danger-light bg-danger-light/40 p-6 text-danger flex items-center gap-3">
         <AlertTriangle size={20} />
-        <span>Couldn't load dashboard data. Try refreshing the page.</span>
+        <span>{t("Couldn't load dashboard data. Try refreshing the page.")}</span>
       </div>
     );
   }
@@ -177,15 +177,6 @@ export function DashboardPage() {
         </Section>
       </div>
 
-      {/* ── Stock Alert ───────────────────────────────────────────────── */}
-      <Section title={`${t("Stock Alert")} (≤ ${data?.low_stock_threshold ?? 5} ${t("Unit Price")})`}>
-        <StockAlertTable
-          items={data?.stock_alert ?? []}
-          threshold={data?.low_stock_threshold ?? 5}
-          isLoading={isLoading}
-        />
-      </Section>
-
       {/* ── Donut chart + Recent invoices ─────────────────────────────── */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
         <Section title={t("Trending Items")} className="lg:col-span-2">
@@ -204,6 +195,15 @@ export function DashboardPage() {
           />
         </Section>
       </div>
+
+      {/* ── Stock Alert ───────────────────────────────────────────────── */}
+      <Section title={`${t("Stock Alert")} (≤ ${data?.low_stock_threshold ?? 5} ${t("units")})`}>
+        <StockAlertTable
+          items={data?.stock_alert ?? []}
+          threshold={data?.low_stock_threshold ?? 5}
+          isLoading={isLoading}
+        />
+      </Section>
     </div>
   );
 }

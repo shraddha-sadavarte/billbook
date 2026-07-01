@@ -1,6 +1,7 @@
 import { useState, useEffect, type FormEvent } from "react";
 import { Modal } from "../../components/ui/Modal";
 import type { AdvancePayment, Customer, PaymentType, AdvancePaymentStatus } from "../../types";
+import { useTranslation } from "../../context/LanguageContext";
 
 interface Props {
   isOpen: boolean;
@@ -12,6 +13,8 @@ interface Props {
 }
 
 export function AdvancePaymentForm({ isOpen, onClose, onSubmit, initialData, customers, isSubmitting }: Props) {
+  const { t } = useTranslation();
+
   const [form, setForm] = useState<{
     customer_id: string;
     amount: string;
@@ -68,25 +71,42 @@ export function AdvancePaymentForm({ isOpen, onClose, onSubmit, initialData, cus
     onSubmit(payload);
   };
 
+  // Mapping for payment type display names
+  const paymentTypeOptions: { value: PaymentType; label: string }[] = [
+    { value: "cash", label: t("Cash") },
+    { value: "bank", label: t("Bank Transfer") },
+    { value: "cheque", label: t("Cheque") },
+    { value: "online", label: t("Online") },
+  ];
+
+  // Mapping for status display names
+  const statusOptions: { value: AdvancePaymentStatus; label: string }[] = [
+    { value: "pending", label: t("Pending") },
+    { value: "applied", label: t("Applied") },
+    { value: "cancelled", label: t("Cancelled") },
+  ];
+
+  const modalTitle = initialData ? t("Edit Advance Payment") : t("New Advance Payment");
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={initialData ? "Edit Advance Payment" : "New Advance Payment"} maxWidth="max-w-lg">
+    <Modal isOpen={isOpen} onClose={onClose} title={modalTitle} maxWidth="max-w-lg">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-slate-500">Customer</label>
+          <label className="mb-1.5 block text-xs font-medium text-slate-500">{t("Customer")}</label>
           <select
             required
             value={form.customer_id}
             onChange={(e) => setForm({ ...form, customer_id: e.target.value })}
             className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
           >
-            <option value="">Select customer</option>
+            <option value="">{t("Select customer")}</option>
             {customers.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </select>
         </div>
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-slate-500">Amount (₹)</label>
+          <label className="mb-1.5 block text-xs font-medium text-slate-500">{t("Amount")} (₹)</label>
           <input
             type="number"
             min="0.01"
@@ -98,7 +118,7 @@ export function AdvancePaymentForm({ isOpen, onClose, onSubmit, initialData, cus
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-slate-500">Payment Date</label>
+          <label className="mb-1.5 block text-xs font-medium text-slate-500">{t("Payment Date")}</label>
           <input
             type="date"
             required
@@ -108,42 +128,41 @@ export function AdvancePaymentForm({ isOpen, onClose, onSubmit, initialData, cus
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-slate-500">Payment Type</label>
+          <label className="mb-1.5 block text-xs font-medium text-slate-500">{t("Payment Type")}</label>
           <select
             required
             value={form.payment_type}
             onChange={(e) => setForm({ ...form, payment_type: e.target.value as PaymentType })}
             className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
           >
-            <option value="cash">Cash</option>
-            <option value="bank">Bank Transfer</option>
-            <option value="cheque">Cheque</option>
-            <option value="online">Online</option>
+            {paymentTypeOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
           </select>
         </div>
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-slate-500">Reference (optional)</label>
+          <label className="mb-1.5 block text-xs font-medium text-slate-500">{t("Reference (optional)")}</label>
           <input
             value={form.reference}
             onChange={(e) => setForm({ ...form, reference: e.target.value })}
-            placeholder="Cheque no., transaction ID, etc."
+            placeholder={t("Cheque no., transaction ID, etc.")}
             className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-slate-500">Status</label>
+          <label className="mb-1.5 block text-xs font-medium text-slate-500">{t("Status")}</label>
           <select
             value={form.status}
             onChange={(e) => setForm({ ...form, status: e.target.value as AdvancePaymentStatus })}
             className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
           >
-            <option value="pending">Pending</option>
-            <option value="applied">Applied</option>
-            <option value="cancelled">Cancelled</option>
+            {statusOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
           </select>
         </div>
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-slate-500">Notes (optional)</label>
+          <label className="mb-1.5 block text-xs font-medium text-slate-500">{t("Notes (optional)")}</label>
           <textarea
             rows={2}
             value={form.notes}
@@ -153,10 +172,10 @@ export function AdvancePaymentForm({ isOpen, onClose, onSubmit, initialData, cus
         </div>
         <div className="flex justify-end gap-2 pt-2">
           <button type="button" onClick={onClose} className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">
-            Cancel
+            {t("Cancel")}
           </button>
           <button type="submit" disabled={isSubmitting} className="rounded-lg bg-brand px-5 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50">
-            {isSubmitting ? "Saving…" : initialData ? "Update" : "Save"}
+            {isSubmitting ? t("Saving…") : initialData ? t("Update") : t("Save")}
           </button>
         </div>
       </form>

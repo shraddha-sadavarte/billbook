@@ -1,4 +1,5 @@
 import type { PermissionCatalog } from "../../types";
+import { useTranslation } from "../../context/LanguageContext";
 
 interface PermissionEditorProps {
   catalog: PermissionCatalog["catalog"];
@@ -17,9 +18,21 @@ const MODULE_LABELS: Record<string, string> = {
   dashboard: "Dashboard",
   reports: "Reports",
   settings: "Settings",
+  advance_payments: "Advance Payments",
+};
+
+const ACTION_LABELS: Record<string, string> = {
+  view: "View",
+  create: "Create",
+  edit: "Edit",
+  delete: "Delete",
+  import: "Import",
+  record_payment: "Record Payment",
 };
 
 export function PermissionEditor({ catalog, selected, onChange, disabled }: PermissionEditorProps) {
+  const { t } = useTranslation();
+
   const toggle = (key: string) => {
     if (disabled) return;
     onChange(selected.includes(key) ? selected.filter((k) => k !== key) : [...selected, key]);
@@ -41,11 +54,12 @@ export function PermissionEditor({ catalog, selected, onChange, disabled }: Perm
       {Object.entries(catalog).map(([moduleKey, actions]) => {
         const moduleKeys = actions.map((a) => `${moduleKey}.${a}`);
         const allSelected = moduleKeys.every((k) => selected.includes(k));
+        const moduleLabel = MODULE_LABELS[moduleKey] || moduleKey;
         return (
           <div key={moduleKey} className="rounded-lg border border-slate-200 p-3">
             <div className="mb-2 flex items-center justify-between">
               <span className="text-sm font-medium text-ink-900">
-                {MODULE_LABELS[moduleKey] ?? moduleKey}
+                {t(moduleLabel)}
               </span>
               <button
                 type="button"
@@ -53,12 +67,13 @@ export function PermissionEditor({ catalog, selected, onChange, disabled }: Perm
                 onClick={() => toggleAllForModule(moduleKey, actions)}
                 className="text-xs font-medium text-brand hover:underline disabled:opacity-40"
               >
-                {allSelected ? "Clear all" : "Select all"}
+                {allSelected ? t("Clear all") : t("Select all")}
               </button>
             </div>
             <div className="flex flex-wrap gap-x-4 gap-y-1.5">
               {actions.map((action) => {
                 const key = `${moduleKey}.${action}`;
+                const actionLabel = ACTION_LABELS[action] || action;
                 return (
                   <label key={key} className="flex items-center gap-1.5 text-sm text-slate-600">
                     <input
@@ -68,7 +83,7 @@ export function PermissionEditor({ catalog, selected, onChange, disabled }: Perm
                       onChange={() => toggle(key)}
                       className="h-3.5 w-3.5 rounded border-slate-300 text-brand focus:ring-brand"
                     />
-                    {action.replace("_", " ")}
+                    {t(actionLabel)}
                   </label>
                 );
               })}

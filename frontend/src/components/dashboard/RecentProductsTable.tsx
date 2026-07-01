@@ -1,6 +1,7 @@
 import type { RecentProduct } from "../../types";
 import { formatMoney } from "../../utils/format";
 import { Link } from "react-router-dom";
+import { useTranslation } from "../../context/LanguageContext";
 
 interface RecentProductsTableProps {
   products: RecentProduct[];
@@ -8,6 +9,8 @@ interface RecentProductsTableProps {
 }
 
 export function RecentProductsTable({ products, isLoading }: RecentProductsTableProps) {
+  const { t } = useTranslation();
+
   if (isLoading) {
     return (
       <div className="space-y-2 p-4">
@@ -21,7 +24,7 @@ export function RecentProductsTable({ products, isLoading }: RecentProductsTable
   if (products.length === 0) {
     return (
       <p className="py-10 text-center text-sm text-slate-400">
-        No products yet. Add your first product to see it here.
+        {t("No products yet. Add your first product to see it here.")}
       </p>
     );
   }
@@ -32,13 +35,13 @@ export function RecentProductsTable({ products, isLoading }: RecentProductsTable
         <thead>
           <tr className="border-b border-slate-100 bg-slate-50">
             <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Sl.No
+              {t("Sl.No")}
             </th>
             <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Item Name
+              {t("Item Name")}
             </th>
             <th className="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Sales Price
+              {t("Sales Price")}
             </th>
           </tr>
         </thead>
