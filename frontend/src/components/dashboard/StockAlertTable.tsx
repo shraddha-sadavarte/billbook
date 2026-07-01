@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Search, Copy, Download, Printer, Columns2 } from "lucide-react";
 import type { StockAlertItem } from "../../types";
+import { useTranslation } from "../../context/LanguageContext";
 
 interface StockAlertTableProps {
   items: StockAlertItem[];
@@ -35,6 +36,7 @@ function downloadCSV(rows: StockAlertItem[], filename: string) {
 }
 
 export function StockAlertTable({ items, threshold, isLoading }: StockAlertTableProps) {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
@@ -72,7 +74,7 @@ export function StockAlertTable({ items, threshold, isLoading }: StockAlertTable
       <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 bg-slate-50 px-4 py-2.5">
         {/* Show entries */}
         <div className="flex items-center gap-1.5 text-xs text-slate-500 mr-auto">
-          <span>Show</span>
+          <span>{t("Show")}</span>
           <select
             value={pageSize}
             onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
@@ -82,7 +84,7 @@ export function StockAlertTable({ items, threshold, isLoading }: StockAlertTable
               <option key={n} value={n}>{n}</option>
             ))}
           </select>
-          <span>entries</span>
+          <span>{t("entries")}</span>
         </div>
 
         {/* Export buttons */}
@@ -91,34 +93,34 @@ export function StockAlertTable({ items, threshold, isLoading }: StockAlertTable
           className="flex items-center gap-1 rounded border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-600 hover:bg-brand hover:text-white hover:border-brand transition-colors"
           title="Copy to clipboard"
         >
-          <Copy size={12} /> Copy
+          <Copy size={12} /> {t("Copy")}
         </button>
         <button
           onClick={() => downloadCSV(filtered, "stock_alert.csv")}
           className="flex items-center gap-1 rounded border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-600 hover:bg-brand hover:text-white hover:border-brand transition-colors"
           title="Download Excel/CSV"
         >
-          <Download size={12} /> Excel
+          <Download size={12} /> {t("Excel")}
         </button>
         <button
           onClick={() => downloadCSV(filtered, "stock_alert.csv")}
           className="flex items-center gap-1 rounded border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-600 hover:bg-brand hover:text-white hover:border-brand transition-colors"
           title="Download CSV"
         >
-          <Download size={12} /> CSV
+          <Download size={12} /> {t("CSV")}
         </button>
         <button
           onClick={() => window.print()}
           className="flex items-center gap-1 rounded border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-600 hover:bg-brand hover:text-white hover:border-brand transition-colors"
           title="Print"
         >
-          <Printer size={12} /> Print
+          <Printer size={12} /> {t("Print")}
         </button>
         <button
           className="flex items-center gap-1 rounded border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors"
           title="Column visibility"
         >
-          <Columns2 size={12} /> Columns
+          <Columns2 size={12} /> {t("Columns")}
         </button>
 
         {/* Search */}
@@ -126,7 +128,7 @@ export function StockAlertTable({ items, threshold, isLoading }: StockAlertTable
           <Search size={12} className="text-slate-400" />
           <input
             type="text"
-            placeholder="Search..."
+            placeholder={t("Search...")}
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             className="w-28 bg-transparent text-xs text-ink-900 placeholder-slate-400 focus:outline-none"
@@ -140,17 +142,17 @@ export function StockAlertTable({ items, threshold, isLoading }: StockAlertTable
           <thead>
             <tr className="border-b border-slate-100">
               <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">#</th>
-              <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Item Name</th>
-              <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">SKU</th>
-              <th className="px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">Stock</th>
-              <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Unit</th>
+              <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">{t("Item Name")}</th>
+              <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">{t("SKU")}</th>
+              <th className="px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">{t("Stock")}</th>
+              <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">{t("Unit")}</th>
             </tr>
           </thead>
           <tbody>
             {slice.length === 0 ? (
               <tr>
                 <td colSpan={5} className="py-10 text-center text-sm italic text-slate-400">
-                  {search ? "No matching records found" : `All products are above the ${threshold}-unit threshold.`}
+                  {search ? t("No matching records found") : t("All products are above the threshold-unit threshold.")}
                 </td>
               </tr>
             ) : (
@@ -186,8 +188,8 @@ export function StockAlertTable({ items, threshold, isLoading }: StockAlertTable
       {/* Footer */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 px-4 py-2.5">
         <p className="text-xs text-slate-500">
-          Showing {from} to {to} of {filtered.length} entries
-          {search && ` (filtered from ${items.length} total entries)`}
+          {t("Showing")} {from} {t("to")} {to} {t("of")} {filtered.length} {t("entries")}
+          {search && ` (${t("filtered")} ${t("of")} ${items.length} ${t("entries")})`}
         </p>
         <div className="flex items-center gap-1.5">
           <button
@@ -195,7 +197,7 @@ export function StockAlertTable({ items, threshold, isLoading }: StockAlertTable
             onClick={() => setPage((p) => p - 1)}
             className="rounded border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            Previous
+            {t("Previous")}
           </button>
           {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map((p) => (
             <button
@@ -215,7 +217,7 @@ export function StockAlertTable({ items, threshold, isLoading }: StockAlertTable
             onClick={() => setPage((p) => p + 1)}
             className="rounded border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            Next
+            {t("Next")}
           </button>
         </div>
       </div>

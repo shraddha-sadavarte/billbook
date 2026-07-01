@@ -1,6 +1,7 @@
 import { Trash2, Plus } from "lucide-react";
 import type { InvoiceItem } from "../../types";
 import { formatMoney } from "../../utils/format";
+import { useTranslation } from "../../context/LanguageContext";
 
 interface InvoiceItemsEditorProps {
   items: InvoiceItem[];
@@ -14,6 +15,8 @@ function lineTotal(item: InvoiceItem) {
 }
 
 export function InvoiceItemsEditor({ items, onChange }: InvoiceItemsEditorProps) {
+  const { t } = useTranslation();
+
   const updateItem = (index: number, patch: Partial<InvoiceItem>) => {
     const next = items.map((item, i) => (i === index ? { ...item, ...patch } : item));
     onChange(next);
@@ -32,11 +35,11 @@ export function InvoiceItemsEditor({ items, onChange }: InvoiceItemsEditorProps)
       <table className="w-full min-w-[640px] text-sm">
         <thead>
           <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs font-medium text-slate-500">
-            <th className="px-4 py-3">Description</th>
-            <th className="w-20 px-3 py-3">Qty</th>
-            <th className="w-28 px-3 py-3">Unit Price</th>
-            <th className="w-20 px-3 py-3">Tax %</th>
-            <th className="w-32 px-4 py-3 text-right">Amount</th>
+            <th className="px-4 py-3">{t("Description")}</th>
+            <th className="w-20 px-3 py-3">{t("Qty")}</th>
+            <th className="w-28 px-3 py-3">{t("Unit Price")}</th>
+            <th className="w-20 px-3 py-3">{t("Tax %")}</th>
+            <th className="w-32 px-4 py-3 text-right">{t("Amount")}</th>
             <th className="w-10 px-2 py-3" />
           </tr>
         </thead>
@@ -49,7 +52,7 @@ export function InvoiceItemsEditor({ items, onChange }: InvoiceItemsEditorProps)
                   <input
                     value={item.description}
                     onChange={(e) => updateItem(index, { description: e.target.value })}
-                    placeholder="Item or service name"
+                    placeholder={t("Item or service name")}
                     className="w-full rounded-md border-0 bg-transparent px-1 py-1.5 text-sm focus:bg-slate-50 focus:outline-none focus:ring-1 focus:ring-brand"
                   />
                 </td>
@@ -92,7 +95,7 @@ export function InvoiceItemsEditor({ items, onChange }: InvoiceItemsEditorProps)
                     type="button"
                     onClick={() => removeItem(index)}
                     className="rounded-md p-1.5 text-slate-400 hover:bg-danger-light hover:text-danger"
-                    aria-label="Remove line item"
+                    aria-label={t("Remove line item")}
                   >
                     <Trash2 size={15} />
                   </button>
@@ -108,7 +111,7 @@ export function InvoiceItemsEditor({ items, onChange }: InvoiceItemsEditorProps)
         className="flex w-full items-center justify-center gap-1.5 border-t border-slate-200 px-4 py-3 text-sm font-medium text-brand hover:bg-brand-light/40"
       >
         <Plus size={16} />
-        Add line item
+        {t("Add line item")}
       </button>
     </div>
   );

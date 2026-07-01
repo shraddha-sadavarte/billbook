@@ -4,8 +4,10 @@ import { useCreateInvoice } from "../hooks/useInvoices";
 import { InvoiceItemsEditor } from "../components/invoices/InvoiceItemsEditor";
 import { InvoiceTotals } from "../components/invoices/InvoiceTotals";
 import type { InvoiceItem, InvoiceStatus } from "../types";
+import { useTranslation } from "../context/LanguageContext";
 
 export function CreateInvoicePage() {
+  const { t } = useTranslation();
   const { data: customersData } = useCustomers({ page: 1 });
   const createInvoice = useCreateInvoice();
 
@@ -42,21 +44,21 @@ export function CreateInvoicePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-ink-900">New Invoice</h1>
-        <p className="text-sm text-slate-500">Add line items below — totals update as you type.</p>
+        <h1 className="text-2xl font-semibold text-ink-900">{t("New Invoice")}</h1>
+        <p className="text-sm text-slate-500">{t("Add line items below — totals update as you type.")}</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <div className="grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-white p-5 sm:grid-cols-2">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-500">Customer</label>
+              <label className="mb-1.5 block text-xs font-medium text-slate-500">{t("Customer")}</label>
               <select
                 value={customerId}
                 onChange={(e) => setCustomerId(e.target.value ? Number(e.target.value) : "")}
                 className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
               >
-                <option value="">Select a customer</option>
+                <option value="">{t("Select a customer")}</option>
                 {customersData?.items.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -66,7 +68,7 @@ export function CreateInvoicePage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-slate-500">Issue date</label>
+                <label className="mb-1.5 block text-xs font-medium text-slate-500">{t("Issue date")}</label>
                 <input
                   type="date"
                   value={issueDate}
@@ -75,7 +77,7 @@ export function CreateInvoicePage() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-slate-500">Due date</label>
+                <label className="mb-1.5 block text-xs font-medium text-slate-500">{t("Due date")}</label>
                 <input
                   type="date"
                   value={dueDate}
@@ -89,12 +91,12 @@ export function CreateInvoicePage() {
           <InvoiceItemsEditor items={items} onChange={setItems} />
 
           <div className="rounded-xl border border-slate-200 bg-white p-5">
-            <label className="mb-1.5 block text-xs font-medium text-slate-500">Notes</label>
+            <label className="mb-1.5 block text-xs font-medium text-slate-500">{t("Notes")}</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              placeholder="Payment terms, thank-you note, etc."
+              placeholder={t("Payment terms, thank-you note, etc.")}
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
             />
           </div>
@@ -115,14 +117,14 @@ export function CreateInvoicePage() {
               disabled={!canSubmit || createInvoice.isPending}
               className="w-full rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {createInvoice.isPending ? "Creating…" : "Create & Send"}
+              {createInvoice.isPending ? t("Creating…") : t("Create & Send")}
             </button>
             <button
               onClick={() => handleSubmit("draft")}
               disabled={!canSubmit || createInvoice.isPending}
               className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-ink-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Save as draft
+              {t("Save as draft")}
             </button>
           </div>
         </div>

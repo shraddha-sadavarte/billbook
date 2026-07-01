@@ -5,14 +5,15 @@ import { TableSkeleton } from "../components/ui/Skeletons";
 import { Modal } from "../components/ui/Modal";
 import { formatMoney } from "../utils/format";
 import type { Customer } from "../types";
+import { useTranslation } from "../context/LanguageContext";
 
 export function CustomersPage() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
 
-  // Form states for creating
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -21,7 +22,6 @@ export function CustomersPage() {
     gstin: "",
   });
 
-  // Form states for editing
   const [editForm, setEditForm] = useState({
     name: "",
     email: "",
@@ -76,7 +76,7 @@ export function CustomersPage() {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm("Are you sure you want to remove this customer?")) {
+    if (confirm(t("Are you sure you want to remove this customer?"))) {
       deleteCustomer.mutate(id);
     }
   };
@@ -85,15 +85,15 @@ export function CustomersPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-ink-900">Customers</h1>
-          <p className="text-sm text-slate-500">{data?.total ?? 0} total</p>
+          <h1 className="text-2xl font-semibold text-ink-900">{t("Customers")}</h1>
+          <p className="text-sm text-slate-500">{data?.total ?? 0} {t("total")}</p>
         </div>
         <button
           onClick={() => setShowForm((v) => !v)}
           className="flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark shadow-sm"
         >
           <Plus size={16} />
-          Add Customer
+          {t("Add Customer")}
         </button>
       </div>
 
@@ -103,47 +103,47 @@ export function CustomersPage() {
           className="grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-white p-6 sm:grid-cols-3 shadow-sm"
         >
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Customer Name</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Customer Name")}</label>
             <input
               required
-              placeholder="e.g. Acme Corp"
+              placeholder={t("e.g. Acme Corp")}
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Email Address</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Email Address")}</label>
             <input
               type="email"
-              placeholder="e.g. billing@acme.com"
+              placeholder={t("e.g. billing@acme.com")}
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Phone Number</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Phone Number")}</label>
             <input
-              placeholder="e.g. +91 98765 43210"
+              placeholder={t("e.g. +91 98765 43210")}
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">GSTIN</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("GSTIN")}</label>
             <input
-              placeholder="e.g. 27AAAAA1111A1Z1"
+              placeholder={t("e.g. 27AAAAA1111A1Z1")}
               value={form.gstin}
               onChange={(e) => setForm({ ...form, gstin: e.target.value })}
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
             />
           </div>
           <div className="sm:col-span-2">
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Billing Address</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Billing Address")}</label>
             <input
-              placeholder="e.g. 123 Main St, Mumbai, MH"
+              placeholder={t("e.g. 123 Main St, Mumbai, MH")}
               value={form.billing_address}
               onChange={(e) => setForm({ ...form, billing_address: e.target.value })}
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand"
@@ -155,14 +155,14 @@ export function CustomersPage() {
               onClick={() => setShowForm(false)}
               className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
             >
-              Cancel
+              {t("Cancel")}
             </button>
             <button
               type="submit"
               disabled={createCustomer.isPending}
               className="rounded-lg bg-brand px-5 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
             >
-              {createCustomer.isPending ? "Saving…" : "Save Customer"}
+              {createCustomer.isPending ? t("Saving…") : t("Save Customer")}
             </button>
           </div>
         </form>
@@ -176,7 +176,7 @@ export function CustomersPage() {
             setSearch(e.target.value);
             setPage(1);
           }}
-          placeholder="Search customers by name…"
+          placeholder={t("Search customers by name…")}
           className="w-full max-w-sm rounded-lg border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand shadow-sm"
         />
       </div>
@@ -185,11 +185,11 @@ export function CustomersPage() {
         <table className="w-full min-w-[760px] text-sm">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs font-medium text-slate-500">
-              <th className="px-4 py-3">Customer Name</th>
-              <th className="px-4 py-3">Contact</th>
-              <th className="px-4 py-3">GSTIN</th>
-              <th className="px-4 py-3 text-right">Balance Due</th>
-              <th className="w-24 px-4 py-3 text-center">Actions</th>
+              <th className="px-4 py-3">{t("Customer Name")}</th>
+              <th className="px-4 py-3">{t("Contact")}</th>
+              <th className="px-4 py-3">{t("GSTIN")}</th>
+              <th className="px-4 py-3 text-right">{t("Balance Due")}</th>
+              <th className="w-24 px-4 py-3 text-center">{t("Actions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -198,7 +198,7 @@ export function CustomersPage() {
             ) : data?.items.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-4 py-10 text-center text-sm text-slate-400">
-                  No customers found matching your search.
+                  {t("No customers found matching your search.")}
                 </td>
               </tr>
             ) : (
@@ -221,14 +221,14 @@ export function CustomersPage() {
                       <button
                         onClick={() => handleEditClick(c)}
                         className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-ink-900 transition-colors"
-                        aria-label="Edit customer"
+                        aria-label={t("Edit customer")}
                       >
                         <Edit2 size={14} />
                       </button>
                       <button
                         onClick={() => handleDelete(c.id)}
                         className="rounded-md p-1.5 text-slate-400 hover:bg-danger-light hover:text-danger transition-colors"
-                        aria-label="Delete customer"
+                        aria-label={t("Delete customer")}
                       >
                         <Trash2 size={14} />
                       </button>
@@ -248,30 +248,29 @@ export function CustomersPage() {
             onClick={() => setPage((p) => p - 1)}
             className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 disabled:opacity-40 hover:bg-slate-50 transition-colors"
           >
-            Previous
+            {t("Previous")}
           </button>
           <span className="text-sm text-slate-500">
-            Page {data.page} of {data.pages}
+            {t("Page")} {data.page} {t("of")} {data.pages}
           </span>
           <button
             disabled={page >= data.pages}
             onClick={() => setPage((p) => p + 1)}
             className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 disabled:opacity-40 hover:bg-slate-50 transition-colors"
           >
-            Next
+            {t("Next")}
           </button>
         </div>
       )}
 
-      {/* ── Edit Customer Modal ──────────────────────────────────────── */}
       <Modal
         isOpen={editingCustomer !== null}
         onClose={() => setEditingCustomer(null)}
-        title="Edit Customer"
+        title={t("Edit Customer")}
       >
         <form onSubmit={handleEditSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Customer Name</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Customer Name")}</label>
             <input
               required
               value={editForm.name}
@@ -280,7 +279,7 @@ export function CustomersPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Email Address</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Email Address")}</label>
             <input
               type="email"
               value={editForm.email}
@@ -289,7 +288,7 @@ export function CustomersPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Phone Number</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Phone Number")}</label>
             <input
               value={editForm.phone}
               onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
@@ -297,7 +296,7 @@ export function CustomersPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">GSTIN</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("GSTIN")}</label>
             <input
               value={editForm.gstin}
               onChange={(e) => setEditForm({ ...editForm, gstin: e.target.value })}
@@ -305,7 +304,7 @@ export function CustomersPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">Billing Address</label>
+            <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">{t("Billing Address")}</label>
             <input
               value={editForm.billing_address}
               onChange={(e) => setEditForm({ ...editForm, billing_address: e.target.value })}
@@ -318,14 +317,14 @@ export function CustomersPage() {
               onClick={() => setEditingCustomer(null)}
               className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
             >
-              Cancel
+              {t("Cancel")}
             </button>
             <button
               type="submit"
               disabled={updateCustomer.isPending}
               className="rounded-lg bg-brand px-5 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
             >
-              {updateCustomer.isPending ? "Saving…" : "Save Changes"}
+              {updateCustomer.isPending ? t("Saving…") : t("Save Changes")}
             </button>
           </div>
         </form>

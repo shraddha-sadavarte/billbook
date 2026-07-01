@@ -10,12 +10,13 @@ import {
 } from "recharts";
 import type { BarChartPoint } from "../../types";
 import { formatMoney } from "../../utils/format";
+import { useTranslation } from "../../context/LanguageContext";
 
 interface SalesBarChartProps {
   data: BarChartPoint[];
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label, t }: any) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-lg text-xs">
@@ -23,7 +24,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       {payload.map((entry: any) => (
         <div key={entry.dataKey} className="flex items-center gap-2">
           <span className="inline-block h-2 w-2 rounded-full" style={{ background: entry.color }} />
-          <span className="capitalize text-slate-500">{entry.name}:</span>
+          <span className="capitalize text-slate-500">{t ? t(entry.name) : entry.name}:</span>
           <span className="font-semibold text-ink-900">{formatMoney(entry.value)}</span>
         </div>
       ))}
@@ -32,10 +33,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export function SalesBarChart({ data }: SalesBarChartProps) {
+  const { t } = useTranslation();
+
   if (!data || data.length === 0) {
     return (
       <div className="flex h-64 items-center justify-center text-sm text-slate-400">
-        No data for the selected period.
+        {t("No data for the selected period.")}
       </div>
     );
   }
@@ -57,15 +60,15 @@ export function SalesBarChart({ data }: SalesBarChartProps) {
           width={52}
           tickFormatter={(v) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v))}
         />
-        <Tooltip content={<CustomTooltip />} cursor={{ fill: "#F8FAFC" }} />
+        <Tooltip content={<CustomTooltip t={t} />} cursor={{ fill: "#F8FAFC" }} />
         <Legend
           iconType="square"
           iconSize={10}
           wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
         />
-        <Bar dataKey="purchase" name="Purchase" fill="#EF4444" radius={[4, 4, 0, 0]} maxBarSize={32} />
-        <Bar dataKey="sales"    name="Sales"    fill="#0D9488" radius={[4, 4, 0, 0]} maxBarSize={32} />
-        <Bar dataKey="expense"  name="Expense"  fill="#22C55E" radius={[4, 4, 0, 0]} maxBarSize={32} />
+        <Bar dataKey="purchase" name={t("Purchase")} fill="#EF4444" radius={[4, 4, 0, 0]} maxBarSize={32} />
+        <Bar dataKey="sales"    name={t("Sales")}    fill="#0D9488" radius={[4, 4, 0, 0]} maxBarSize={32} />
+        <Bar dataKey="expense"  name={t("Expense")}  fill="#22C55E" radius={[4, 4, 0, 0]} maxBarSize={32} />
       </BarChart>
     </ResponsiveContainer>
   );

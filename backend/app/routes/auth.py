@@ -117,11 +117,15 @@ def refresh():
     if not user:
         return jsonify({"error": "User not found"}), 404
 
+    permissions = list(user.role_ref.permissions) if user.role_ref else []
+    if user.role_ref and user.role_ref.is_system:
+        permissions = all_permission_keys()
+
     new_claims = {
         "tenant_id": user.tenant_id,
         "is_super_admin": user.is_super_admin,
         "role_id": user.role_id,
-        "permissions": list(user.role_ref.permissions) if user.role_ref else [],
+        "permissions": permissions,
     }
     access_token = create_access_token(identity=identity, additional_claims=new_claims)
     return jsonify({"access_token": access_token}), 200
@@ -138,9 +142,14 @@ def me():
     if not user:
         return jsonify({"error": "User not found"}), 404
     data = user.to_dict()
-    data["permissions"] = list(user.role_ref.permissions) if user.role_ref else (
-        ["*"] if user.is_super_admin else []
-    )
+
+    if user.is_super_admin:
+        data["permissions"] = ["*"]
+    elif user.role_ref and user.role_ref.is_system:
+        data["permissions"] = all_permission_keys()
+    else:
+        data["permissions"] = list(user.role_ref.permissions) if user.role_ref else []
+
     return jsonify(data), 200
 
 

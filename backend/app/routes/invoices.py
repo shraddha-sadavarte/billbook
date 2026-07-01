@@ -5,12 +5,36 @@ from marshmallow import ValidationError
 from sqlalchemy.exc import IntegrityError
 
 from app.extensions import db
-from app.models import Invoice, InvoiceItem, InvoiceStatus
+from app.models import Invoice, InvoiceItem, InvoiceStatus, Product
 from app.schemas import InvoiceSchema
 from app.tenant_scope import TenantContext
 from app.utils.decorators import require_auth
 
 invoices_bp = Blueprint("invoices", __name__, url_prefix="/api/v1/invoices")
+
+
+def _is_stock_affecting(status: InvoiceStatus) -> bool:
+    return status in (InvoiceStatus.PENDING, InvoiceStatus.PAID, InvoiceStatus.OVERDUE)
+
+
+def restore_invoice_stock(invoice: Invoice) -> None:
+    if not _is_stock_affecting(invoice.status):
+        return
+    for item in invoice.items:
+        if item.product_id:
+            product = Product.query.get(item.product_id)
+            if product:
+                product.stock_quantity = (product.stock_quantity or 0) + item.quantity
+
+
+def deduct_invoice_stock(invoice: Invoice) -> None:
+    if not _is_stock_affecting(invoice.status):
+        return
+    for item in invoice.items:
+        if item.product_id:
+            product = Product.query.get(item.product_id)
+            if product:
+                product.stock_quantity = (product.stock_quantity or 0) - item.quantity
 
 
 def _generate_invoice_number() -> str:
@@ -119,6 +143,7 @@ def create_invoice():
         if invoice.status == InvoiceStatus.PAID:
             invoice.amount_paid = invoice.grand_total
 
+        deduct_invoice_stock(invoice)
         db.session.add(invoice)
         try:
             db.session.commit()
@@ -138,6 +163,8 @@ def update_invoice(invoice_id):
         data = InvoiceSchema(partial=True).load(request.get_json(force=True) or {})
     except ValidationError as err:
         return jsonify({"error": "Validation failed", "details": err.messages}), 422
+
+    restore_invoice_stock(invoice)
 
     items_data = data.pop("items", None)
 
@@ -171,6 +198,8 @@ def update_invoice(invoice_id):
     elif invoice.amount_paid > 0:
         invoice.status = InvoiceStatus.PENDING
 
+    deduct_invoice_stock(invoice)
+
     db.session.commit()
     return jsonify(invoice.to_dict())
 
@@ -179,6 +208,7 @@ def update_invoice(invoice_id):
 @require_auth
 def delete_invoice(invoice_id):
     invoice = Invoice.query.get_or_404(invoice_id)
+    restore_invoice_stock(invoice)
     db.session.delete(invoice)
     db.session.commit()
     return "", 204
@@ -189,6 +219,8 @@ def delete_invoice(invoice_id):
 def record_payment(invoice_id):
     """Records a (partial or full) payment against an invoice and updates status."""
     invoice = Invoice.query.get_or_404(invoice_id)
+    restore_invoice_stock(invoice)
+
     payload = request.get_json(force=True) or {}
     amount = payload.get("amount")
 
@@ -200,6 +232,8 @@ def record_payment(invoice_id):
         invoice.status = InvoiceStatus.PAID
     else:
         invoice.status = InvoiceStatus.PENDING
+
+    deduct_invoice_stock(invoice)
 
     db.session.commit()
     return jsonify(invoice.to_dict())

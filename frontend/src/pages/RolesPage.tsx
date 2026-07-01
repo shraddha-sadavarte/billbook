@@ -5,8 +5,10 @@ import { Modal } from "../components/ui/Modal";
 import { PermissionEditor } from "../components/ui/PermissionEditor";
 import { useAuth } from "../context/AuthContext";
 import type { Role } from "../types";
+import { useTranslation } from "../context/LanguageContext";
 
 export function RolesPage() {
+  const { t } = useTranslation();
   const { hasPermission } = useAuth();
   const { data: roles, isLoading } = useRoles();
   const { data: catalog } = usePermissionCatalog();
@@ -47,8 +49,8 @@ export function RolesPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-ink-900">Roles</h1>
-          <p className="text-sm text-slate-500">Define what each role can see and do.</p>
+          <h1 className="text-2xl font-semibold text-ink-900">{t("Roles")}</h1>
+          <p className="text-sm text-slate-500">{t("Define what each role can see and do.")}</p>
         </div>
         {hasPermission("roles.create") && (
           <button
@@ -56,7 +58,7 @@ export function RolesPage() {
             className="flex items-center gap-1.5 rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark"
           >
             <Plus size={16} />
-            New Role
+            {t("New Role")}
           </button>
         )}
       </div>
@@ -76,15 +78,15 @@ export function RolesPage() {
                   </div>
                   <div>
                     <p className="font-medium text-ink-900">{role.name}</p>
-                    <p className="text-xs text-slate-400">{role.user_count} user{role.user_count === 1 ? "" : "s"}</p>
+                    <p className="text-xs text-slate-400">{role.user_count} {role.user_count === 1 ? "user" : "users"}</p>
                   </div>
                 </div>
                 {role.is_system && (
-                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">Built-in</span>
+                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">{t("Built-in")}</span>
                 )}
               </div>
               {role.description && <p className="mt-3 text-sm text-slate-500">{role.description}</p>}
-              <p className="mt-2 text-xs text-slate-400">{role.permissions.length} permissions granted</p>
+              <p className="mt-2 text-xs text-slate-400">{role.permissions.length} {t("permissions granted")}</p>
 
               <div className="mt-4 flex gap-2">
                 {hasPermission("roles.edit") && (
@@ -93,7 +95,7 @@ export function RolesPage() {
                     className="flex items-center gap-1 rounded-md border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-ink-700 hover:bg-slate-50"
                   >
                     <Pencil size={12} />
-                    Edit
+                    {t("Edit")}
                   </button>
                 )}
                 {hasPermission("roles.delete") && !role.is_system && (
@@ -102,7 +104,7 @@ export function RolesPage() {
                     className="flex items-center gap-1 rounded-md border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-danger hover:bg-danger-light"
                   >
                     <Trash2 size={12} />
-                    Delete
+                    {t("Delete")}
                   </button>
                 )}
               </div>
@@ -114,17 +116,17 @@ export function RolesPage() {
       <Modal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        title={editingRole ? "Edit role" : "New role"}
+        title={editingRole ? t("Edit role") : t("New role")}
         maxWidth="max-w-2xl"
       >
         <div className="space-y-4">
           {isSystemRole && (
             <p className="rounded-md bg-warn-light px-3 py-2 text-xs text-warn">
-              This is a built-in role and can't be edited.
+              {t("This is a built-in role and can't be edited.")}
             </p>
           )}
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-500">Role name</label>
+            <label className="mb-1.5 block text-xs font-medium text-slate-500">{t("Role name")}</label>
             <input
               value={form.name}
               disabled={isSystemRole}
@@ -133,7 +135,7 @@ export function RolesPage() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-500">Description</label>
+            <label className="mb-1.5 block text-xs font-medium text-slate-500">{t("Description")}</label>
             <input
               value={form.description}
               disabled={isSystemRole}
@@ -142,7 +144,7 @@ export function RolesPage() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-500">Permissions</label>
+            <label className="mb-1.5 block text-xs font-medium text-slate-500">{t("Permissions")}</label>
             {catalog ? (
               <PermissionEditor
                 catalog={catalog.catalog}
@@ -161,7 +163,7 @@ export function RolesPage() {
               disabled={!form.name || createRole.isPending || updateRole.isPending}
               className="w-full rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
             >
-              {createRole.isPending || updateRole.isPending ? "Saving…" : "Save role"}
+              {createRole.isPending || updateRole.isPending ? t("Saving…") : t("Save role")}
             </button>
           )}
         </div>

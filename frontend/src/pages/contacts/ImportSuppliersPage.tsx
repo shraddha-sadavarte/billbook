@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from "react";
 import { Upload } from "lucide-react";
 import { useImportSuppliers } from "../../hooks/useSuppliers";
+import { useTranslation } from "../../context/LanguageContext";
 
 export function ImportSuppliersPage() {
+  const { t } = useTranslation();
   const [file, setFile] = useState<File | null>(null);
   const importSuppliers = useImportSuppliers();
 
@@ -17,8 +19,8 @@ export function ImportSuppliersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-ink-900">Import Suppliers</h2>
-        <p className="text-sm text-slate-500">Upload a CSV file to bulk import supplier records into BillBook.</p>
+        <h2 className="text-xl font-semibold text-ink-900">{t("Import Suppliers")}</h2>
+        <p className="text-sm text-slate-500">{t("Upload a CSV file to bulk import supplier records into BillBook.")}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5 rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
@@ -26,8 +28,8 @@ export function ImportSuppliersPage() {
           <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-5">
             <label className="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-transparent px-4 py-10 text-center text-sm text-slate-500 transition hover:border-slate-300 hover:bg-slate-50">
               <Upload size={24} className="text-slate-400" />
-              <span className="font-medium text-slate-700">Drag and drop a CSV here, or click to select a file</span>
-              <span className="text-xs text-slate-400">Required columns: name, mobile, email, phone, gst_number, tax_number, opening_balance, country, state, city, postcode, address</span>
+              <span className="font-medium text-slate-700">{t("Drag and drop a CSV here, or click to select a file")}</span>
+              <span className="text-xs text-slate-400">{t("Required columns: name, mobile, email, phone, gst_number, tax_number, opening_balance, country, state, city, postcode, address")}</span>
               <input
                 type="file"
                 accept=".csv"
@@ -39,19 +41,19 @@ export function ImportSuppliersPage() {
 
           {file && (
             <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
-              Selected file: <span className="font-medium">{file.name}</span>
+              {t("Selected file")}: <span className="font-medium">{file.name}</span>
             </div>
           )}
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-slate-500">Use a CSV with one supplier per row. Empty optional fields are allowed.</p>
+          <p className="text-sm text-slate-500">{t("Use a CSV with one supplier per row. Empty optional fields are allowed.")}</p>
           <button
             type="submit"
             disabled={!file || importSuppliers.isPending}
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
           >
-            {importSuppliers.isPending ? "Importing…" : "Import suppliers"}
+            {importSuppliers.isPending ? t("Importing…") : t("Import suppliers")}
           </button>
         </div>
       </form>

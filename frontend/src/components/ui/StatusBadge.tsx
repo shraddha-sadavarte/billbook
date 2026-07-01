@@ -1,4 +1,5 @@
 import type { InvoiceStatus } from "../../types";
+import { useTranslation } from "../../context/LanguageContext";
 
 const STYLES: Record<InvoiceStatus, string> = {
   draft: "bg-slate-100 text-slate-600",
@@ -17,11 +18,12 @@ const LABELS: Record<InvoiceStatus, string> = {
 };
 
 export function StatusBadge({ status }: { status: InvoiceStatus }) {
+  const { t } = useTranslation();
   return (
     <span
       className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${STYLES[status]}`}
     >
-      {LABELS[status]}
+      {t(LABELS[status])}
     </span>
   );
 }

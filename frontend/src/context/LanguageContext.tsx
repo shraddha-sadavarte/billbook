@@ -13,7 +13,7 @@ const LanguageContext = createContext<LanguageContextValue | undefined>(undefine
 const TRANSLATIONS: Record<Language, Record<string, string>> = {
   English: {},
   Hindi: {
-    // Sidebar & Menus
+    // ── Sidebar & Menus ─────────────────────────────────────────────
     "Dashboard": "डैशबोर्ड",
     "Sales": "बिक्री",
     "Sales List": "बिक्री सूची",
@@ -27,7 +27,81 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     "Advance": "अग्रिम",
     "Main Menu": "मुख्य मेनू",
 
-    // Headers & Dropdown Actions
+        // ── Invoice / Sales Pages ──────────────────────────────────────────
+    "New Invoice": "नया चालान",
+    "Add line items below — totals update as you type.":
+      "नीचे लाइन आइटम जोड़ें — टोटल टाइप करते समय अपडेट होते हैं।",
+    "Select a customer": "एक ग्राहक चुनें",
+    "Issue date": "जारी करने की तारीख",
+    "Due date": "देय तारीख",
+    "Notes": "नोट्स",
+    "Payment terms, thank-you note, etc.": "भुगतान शर्तें, धन्यवाद नोट, आदि।",
+    "Creating…": "बना रहा है…",
+    "Create & Send": "बनाएं और भेजें",
+    "Save as draft": "ड्राफ्ट के रूप में सहेजें",
+    "total": "कुल",
+    "Add Customer": "ग्राहक जोड़ें",
+    "Customer Name": "ग्राहक का नाम",
+    "e.g. Acme Corp": "उदा. Acme Corp",
+    "Email Address": "ईमेल पता",
+    "e.g. billing@acme.com": "उदा. billing@acme.com",
+    "Phone Number": "फोन नंबर",
+    "e.g. +91 98765 43210": "उदा. +91 98765 43210",
+    "GSTIN": "जीएसटीआईएन",
+    "e.g. 27AAAAA1111A1Z1": "उदा. 27AAAAA1111A1Z1",
+    "Billing Address": "बिलिंग पता",
+    "e.g. 123 Main St, Mumbai, MH": "उदा. 123 Main St, मुंबई, MH",
+    "Save Customer": "ग्राहक सहेजें",
+    "Search customers by name…": "नाम से ग्राहक खोजें…",
+    "Contact": "संपर्क",
+    "Balance Due": "बकाया शेष",
+    "No customers found matching your search.": "आपकी खोज से मेल खाने वाला कोई ग्राहक नहीं मिला।",
+    "Are you sure you want to remove this customer?": "क्या आप इस ग्राहक को हटाना चाहते हैं?",
+    "Edit customer": "ग्राहक संपादित करें",
+    "Delete customer": "ग्राहक हटाएं",
+    "Edit Customer": "ग्राहक संपादित करें",
+
+    "Back to sales": "बिक्री पर वापस जाएं",
+    "Change Status": "स्थिति बदलें",
+    "Record Payment": "भुगतान दर्ज करें",
+    "Print Invoice": "चालान प्रिंट करें",
+    "BillBook Invoice": "बिलबुक चालान",
+    "Invoice": "चालान",
+    "Issued": "जारी किया गया",
+    "Due": "देय",
+    "Billed To": "बिल प्राप्तकर्ता",
+    "Email": "ईमेल",
+    "Phone": "फोन",
+    "Description": "विवरण",
+    "Qty": "मात्रा",
+    "Unit Price": "इकाई मूल्य",
+    "Tax Rate": "कर दर",
+    "Amount": "रकम",
+    "Subtotal": "उप-योग",
+    "Tax": "कर",
+    "Discount": "छूट",
+    "Total": "कुल",
+    "Amount Paid": "भुगतान की गई रकम",
+    "Notes / Comments": "नोट्स / टिप्पणियाँ",
+    "Enter the amount collected from the customer. The balance due is":
+      "ग्राहक से एकत्र की गई राशि दर्ज करें। बकाया शेष है",
+    "Payment Amount": "भुगतान राशि",
+    "e.g. 500.00": "उदा. 500.00",
+    "Recording…": "दर्ज हो रहा है…",
+    "Are you sure you want to permanently delete this invoice? This action cannot be undone.":
+      "क्या आप इस चालान को स्थायी रूप से हटाना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती।",
+    "draft": "ड्राफ्ट",
+    "pending": "लंबित",
+    "paid": "भुगतान किया गया",
+    "overdue": "विलंबित",
+    "cancelled": "रद्द",
+
+    "New Sale": "नई बिक्री",
+    "Search sales…": "बिक्री खोजें…",
+    "All": "सभी",
+    "No invoices match this filter.": "इस फ़िल्टर से मेल खाने वाला कोई चालान नहीं।",
+
+    // ── Headers & Dropdown Actions ──────────────────────────────────
     "Super Admin": "सुपर एडमिन",
     "Tenant Admin": "किराया व्यवस्थापक",
     "User": "उपयोगकर्ता",
@@ -38,7 +112,7 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     "Clear all": "सभी साफ करें",
     "No unread notifications": "कोई नई सूचनाएं नहीं",
 
-    // General Common UI
+    // ── General Common UI ───────────────────────────────────────────
     "Search": "खोजें",
     "Search...": "खोजें...",
     "Save": "सहेजें",
@@ -48,14 +122,80 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     "Save Changes": "बदलाव सहेजें",
     "Actions": "कार्रवाई",
     "Status": "स्थिति",
-    "Amount": "रकम",
     "Date": "तारीख",
     "Price": "कीमत",
     "Name": "नाम",
-    "Email": "ईमेल",
-    "Phone": "फ़ोन",
+    "Close": "बंद करें",
+    "Select all": "सभी चुनें",
+    "View": "देखें",
+    "Create": "बनाएं",
+    "Import": "आयात करें",
+    "Suppliers": "आपूर्तिकर्ता",
+    "Reports": "रिपोर्ट",
+    "Settings": "सेटिंग्स",
+    "Advance Payments": "अग्रिम भुगतान",
 
-    // Dashboard Screen
+        // ── Contacts / Suppliers ──────────────────────────────────────────
+    "Contacts": "संपर्क",
+    "Manage your customers, suppliers, and import contact lists from one place.":
+      "अपने ग्राहकों, आपूर्तिकर्ताओं और संपर्क सूचियों को एक स्थान से प्रबंधित करें।",
+    "Import Customers": "ग्राहक आयात करें",
+    "Import Suppliers": "आपूर्तिकर्ता आयात करें",
+    "Upload a CSV file to bulk import customer records into BillBook.":
+      "बिलबुक में ग्राहक रिकॉर्ड बल्क आयात करने के लिए CSV फ़ाइल अपलोड करें।",
+    "Upload a CSV file to bulk import supplier records into BillBook.":
+      "बिलबुक में आपूर्तिकर्ता रिकॉर्ड बल्क आयात करने के लिए CSV फ़ाइल अपलोड करें।",
+    "Drag and drop a CSV here, or click to select a file":
+      "CSV फ़ाइल यहाँ खींचें और छोड़ें, या फ़ाइल चुनने के लिए क्लिक करें",
+    "Required columns: name, email, phone, billing_address, gstin":
+      "आवश्यक कॉलम: नाम, ईमेल, फोन, बिलिंग पता, जीएसटीआईएन",
+    "Required columns: name, mobile, email, phone, gst_number, tax_number, opening_balance, country, state, city, postcode, address":
+      "आवश्यक कॉलम: नाम, मोबाइल, ईमेल, फोन, जीएसटी नंबर, टैक्स नंबर, प्रारंभिक शेष, देश, राज्य, शहर, पोस्टकोड, पता",
+    "Selected file": "चयनित फ़ाइल",
+    "Use a CSV with one customer per row. Empty optional fields are allowed.":
+      "एक CSV का उपयोग करें जिसमें प्रत्येक पंक्ति में एक ग्राहक हो। खाली वैकल्पिक फ़ील्ड की अनुमति है।",
+    "Use a CSV with one supplier per row. Empty optional fields are allowed.":
+      "एक CSV का उपयोग करें जिसमें प्रत्येक पंक्ति में एक आपूर्तिकर्ता हो। खाली वैकल्पिक फ़ील्ड की अनुमति है।",
+    "Import customers": "ग्राहक आयात करें",
+    "Import suppliers": "आपूर्तिकर्ता आयात करें",
+    "Importing…": "आयात हो रहा है…",
+    "Manage supplier contacts, opening balances and address details.":
+      "आपूर्तिकर्ता संपर्क, प्रारंभिक शेष और पता विवरण प्रबंधित करें।",
+    "total suppliers": "कुल आपूर्तिकर्ता",
+    "Add Supplier": "आपूर्तिकर्ता जोड़ें",
+    "You don't have permission to add suppliers.":
+      "आपके पास आपूर्तिकर्ता जोड़ने की अनुमति नहीं है।",
+    "Supplier Name": "आपूर्तिकर्ता का नाम",
+    "e.g. Acme Suppliers": "उदा. Acme आपूर्तिकर्ता",
+    "Mobile": "मोबाइल",
+    "e.g. supplier@example.com": "उदा. supplier@example.com",
+    "e.g. 022 1234 5678": "उदा. 022 1234 5678",
+    "GST Number": "जीएसटी नंबर",
+    "Tax Number": "टैक्स नंबर",
+    "e.g. 123456789": "उदा. 123456789",
+    "Opening Balance": "प्रारंभिक शेष",
+    "Country": "देश",
+    "State": "राज्य",
+    "City": "शहर",
+    "Postcode": "पोस्टकोड",
+    "Address": "पता",
+    "Start typing or choose a country": "टाइप करना शुरू करें या देश चुनें",
+    "Start typing or choose a state": "टाइप करना शुरू करें या राज्य चुनें",
+    "Start typing or choose a city": "टाइप करना शुरू करें या शहर चुनें",
+    "Save Supplier": "आपूर्तिकर्ता सहेजें",
+    "Search suppliers by name…": "नाम से आपूर्तिकर्ता खोजें…",
+    "Supplier": "आपूर्तिकर्ता",
+    "GST / Tax": "जीएसटी / टैक्स",
+    "Balance": "शेष",
+    "No suppliers found matching your search.":
+      "आपकी खोज से मेल खाने वाला कोई आपूर्तिकर्ता नहीं मिला।",
+    "Are you sure you want to remove this supplier?":
+      "क्या आप इस आपूर्तिकर्ता को हटाना चाहते हैं?",
+    "Edit supplier": "आपूर्तिकर्ता संपादित करें",
+    "Delete supplier": "आपूर्तिकर्ता हटाएं",
+    "Edit Supplier": "आपूर्तिकर्ता संपादित करें",
+
+    // ── Dashboard Screen ─────────────────────────────────────────────
     "Overview of your business performance": "आपके व्यावसायिक प्रदर्शन का अवलोकन",
     "Sales Due": "बिक्री देय",
     "Purchase Due": "खरीद देय",
@@ -64,40 +204,44 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     "Recent Sales Invoices": "हालिया बिक्री चालान",
     "Stock Alert": "स्टॉक चेतावनी",
     "Trending Products": "प्रचलित उत्पाद",
-    "Invoice": "चालान",
     "Customer": "ग्राहक",
     "Recent Products": "हालिया उत्पाद",
     "Stock Quantity": "स्टॉक मात्रा",
-    "Unit Price": "इकाई मूल्य",
     "Trending Items": "ट्रेंडिंग आइटम",
     "Quantity": "मात्रा",
     "Stock Alert Items": "स्टॉक चेतावनी आइटम",
     "SKU": "एसकेयू",
     "Current Stock": "वर्तमान स्टॉक",
-    
-    // Count Cards
+
+    // ── Count Cards ──────────────────────────────────────────────────
     "Invoices": "चालान",
     "Paid Invoices": "भुगतान किए गए चालान",
-    
-    // Period Filters
+
+    // ── Period Filters ──────────────────────────────────────────────
     "Today": "आज",
     "Weekly": "साप्ताहिक",
     "Monthly": "मासिक",
     "Yearly": "वार्षिक",
-    "All": "सभी",
 
-    // Bar Chart
+    // ── Bar Chart ────────────────────────────────────────────────────
     "Purchase, Sales & Expense Bar Chart": "खरीद, बिक्री और व्यय चार्ट",
     "Purchase": "खरीद",
+    "No data for the selected period.": "चयनित अवधि के लिए कोई डेटा नहीं है।",
 
-    // Table Headers
+    // ── Table Headers ──────────────────────────────────────────────
     "SL.No": "क्र.सं.",
+    "Sl.No": "क्र.सं.",
     "Item Name": "सामग्री का नाम",
     "Sales Price": "बिक्री मूल्य",
     "Stock": "स्टॉक",
     "Unit": "इकाई",
+    "Invoice ID": "चालान आईडी",
+    "Created By": "द्वारा बनाया गया",
+    "units": "इकाइयां",
+    "Tax %": "कर %",
+    "Discount value": "छूट राशि",
 
-    // Datatable Controls
+    // ── Datatable Controls ──────────────────────────────────────────
     "Show": "दिखाएं",
     "entries": "प्रविष्टियां",
     "Copy": "कॉपी",
@@ -111,13 +255,126 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     "Previous": "पिछला",
     "Next": "अगला",
 
-    // Notifications Mock Texts
+    // ── Statuses ─────────────────────────────────────────────────────
+    "Draft": "ड्राफ्ट",
+    "Pending": "लंबित",
+    "Paid": "भुगतान किया गया",
+    "Overdue": "विलंबित",
+    "Cancelled": "रद्द",
+
+    // ── Invoice Items Editor ──────────────────────────────────────
+    "Item or service name": "आइटम या सेवा का नाम",
+    "Add line item": "पंक्ति जोड़ें",
+    "Remove line item": "पंक्ति हटाएं",
+
+    // ── Fallback Messages ──────────────────────────────────────────
+    "No products yet. Add your first product to see it here.": "अभी तक कोई उत्पाद नहीं है। इसे यहाँ देखने के लिए अपना पहला उत्पाद जोड़ें।",
+    "No invoices yet. Create your first invoice.": "अभी तक कोई चालान नहीं है। अपना पहला चालान बनाएं।",
+    "All products are above the threshold-unit threshold.": "सभी उत्पाद सीमा सीमा से ऊपर हैं।",
+    "No matching records found": "कोई मेल खाते रिकॉर्ड नहीं मिले",
+
+    // ── Notifications Mock Texts ──────────────────────────────────
     "Welcome to BillBook workspace!": "बिलबुक वर्कस्पेस में आपका स्वागत है!",
     "Low stock alert: Premium Widget is below 10 units": "कम स्टॉक अलर्ट: प्रीमियम विजेट 10 इकाइयों से नीचे है",
     "New customer Rohal Retail Pvt Ltd registered": "नया ग्राहक रोहल रिटेल प्राइवेट लिमिटेड पंजीकृत",
+
+    // ── Advance Payments Module ──────────────────────────────────────
+    "Advance Payments List": "अग्रिम भुगतान सूची",
+    "Track advance payments received from customers.": "ग्राहकों से प्राप्त अग्रिम भुगतानों को ट्रैक करें।",
+    "New Advance Payment": "नया अग्रिम भुगतान",
+    "Edit Advance Payment": "अग्रिम भुगतान संपादित करें",
+    "Select customer": "ग्राहक चुनें",
+    "Payment Date": "भुगतान तारीख",
+    "Payment Type": "भुगतान प्रकार",
+    "Reference (optional)": "संदर्भ (वैकल्पिक)",
+    "Cheque no., transaction ID, etc.": "चेक नं., लेनदेन आईडी, आदि",
+    "Notes (optional)": "नोट्स (वैकल्पिक)",
+    "Cash": "नकद",
+    "Bank Transfer": "बैंक हस्तांतरण",
+    "Cheque": "चेक",
+    "Online": "ऑनलाइन",
+    "Applied": "लागू",
+    "Are you sure you want to delete this advance payment?": "क्या आप इस अग्रिम भुगतान को हटाना चाहते हैं?",
+    "ID": "आईडी",
+    "Search by ID or customer…": "आईडी या ग्राहक द्वारा खोजें…",
+    "No advance payments found.": "कोई अग्रिम भुगतान नहीं मिला।",
+    "Page": "पृष्ठ",
+
+        // ── Login / Signup ──────────────────────────────────────────────
+    "Welcome back": "वापसी पर स्वागत है",
+    "Sign in to your BillBook workspace": "अपने BillBook वर्कस्पेस में साइन इन करें",
+    "Signing in…": "साइन इन हो रहा है…",
+    "Sign in": "साइन इन करें",
+    "New business?": "नया व्यवसाय?",
+    "Set up your workspace": "अपना वर्कस्पेस सेट करें",
+    "Start billing in under a minute": "एक मिनट से भी कम समय में बिलिंग शुरू करें",
+    "Business name": "व्यवसाय का नाम",
+    "Your name": "आपका नाम",
+    "At least 8 characters": "कम से कम 8 अक्षर",
+    "Setting up…": "सेट हो रहा है…",
+    "Create workspace": "वर्कस्पेस बनाएं",
+    "Already have a workspace?": "पहले से एक वर्कस्पेस है?",
+
+    // ── POS ──────────────────────────────────────────────────────────
+    "Create a point-of-sale sale quickly with product cards and cart totals.":
+      "उत्पाद कार्ड और कार्ट कुल के साथ जल्दी से पॉइंट-ऑफ-सेल बिक्री बनाएं।",
+    "Add customer": "ग्राहक जोड़ें",
+    "Product search": "उत्पाद खोज",
+    "Search products...": "उत्पाद खोजें...",
+    "Walk-in customer": "वॉक-इन ग्राहक",
+    "Cart": "कार्ट",
+    "items": "आइटम",
+    "Add products to the cart to start the sale.": "बिक्री शुरू करने के लिए कार्ट में उत्पाद जोड़ें।",
+    "Item": "आइटम",
+    "Grand total": "कुल योग",
+    "available": "उपलब्ध",
+    "Hold": "होल्ड",
+    "Multiple": "मल्टीपल",
+    "Pay All": "सभी का भुगतान करें",
+    "Processing…": "प्रोसेस हो रहा है…",
+    "Review the order before checkout.": "चेकआउट से पहले ऑर्डर की समीक्षा करें।",
+
+    // ── Products ──────────────────────────────────────────────────────
+    "Import Products": "उत्पाद आयात करें",
+    "Upload a CSV file to bulk import products.":
+      "बल्क आयात के लिए CSV फ़ाइल अपलोड करें।",
+    "Import products": "उत्पाद आयात करें",
+    "Drag and drop a CSV file here, or click to select a file.":
+      "CSV फ़ाइल को यहाँ खींचें और छोड़ें, या फ़ाइल चुनने के लिए क्लिक करें।",
+    "Required columns: name, sku, description, unit_price, tax_rate, stock_quantity, unit":
+      "आवश्यक कॉलम: नाम, sku, विवरण, इकाई मूल्य, कर दर, स्टॉक मात्रा, इकाई",
+    "Selected file:": "चयनित फ़ाइल:",
+    "You do not have permission to import products. Contact your administrator to request the products.import permission.":
+      "आपके पास उत्पाद आयात करने की अनुमति नहीं है। products.import अनुमति का अनुरोध करने के लिए अपने व्यवस्थापक से संपर्क करें।",
+    "Stock Status": "स्टॉक स्थिति",
+    "Add Product": "उत्पाद जोड़ें",
+    "Save Product": "उत्पाद सहेजें",
+
+    // ── Roles ────────────────────────────────────────────────────────
+    "Define what each role can see and do.":
+      "प्रत्येक भूमिका क्या देख और कर सकती है, इसे परिभाषित करें।",
+    "New Role": "नई भूमिका",
+    "Built-in": "अंतर्निहित",
+    "permissions granted": "अनुमतियाँ प्रदान की गईं",
+    "Edit role": "भूमिका संपादित करें",
+    "New role": "नई भूमिका",
+    "This is a built-in role and can't be edited.":
+      "यह एक अंतर्निहित भूमिका है और इसे संपादित नहीं किया जा सकता है।",
+    "Role name": "भूमिका का नाम",
+    "Save role": "भूमिका सहेजें",
+
+    // ── Users ────────────────────────────────────────────────────────
+    "Add User": "उपयोगकर्ता जोड़ें",
+    "Search users…": "उपयोगकर्ता खोजें…",
+    "Joined": "शामिल हुए",
+    "Active": "सक्रिय",
+    "Inactive": "निष्क्रिय",
+    "No users yet.": "अभी तक कोई उपयोगकर्ता नहीं।",
+    "Add user": "उपयोगकर्ता जोड़ें",
+    "Adding…": "जोड़ा जा रहा है…",
   },
   Marathi: {
-    // Sidebar & Menus
+    // ── Sidebar & Menus ─────────────────────────────────────────────
     "Dashboard": "डॅशबोर्ड",
     "Sales": "विक्री",
     "Sales List": "विक्री सूची",
@@ -131,7 +388,81 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     "Advance": "आगाऊ रक्कम",
     "Main Menu": "मुख्य मेनू",
 
-    // Headers & Dropdown Actions
+        // ── Invoice / Sales Pages ──────────────────────────────────────────
+    "New Invoice": "नवीन पावती",
+    "Add line items below — totals update as you type.":
+      "खाली ओळ आयटम जोडा — टाइप करताना एकूण अपडेट होतात.",
+    "Select a customer": "ग्राहक निवडा",
+    "Issue date": "जारी करण्याची तारीख",
+    "Due date": "देय तारीख",
+    "Notes": "नोट्स",
+    "Payment terms, thank-you note, etc.": "पेमेंट अटी, धन्यवाद नोट, इ.",
+    "Creating…": "तयार करत आहे…",
+    "Create & Send": "तयार करा आणि पाठवा",
+    "Save as draft": "ड्राफ्ट म्हणून जतन करा",
+    "total": "एकूण",
+    "Add Customer": "ग्राहक जोडा",
+    "Customer Name": "ग्राहकाचे नाव",
+    "e.g. Acme Corp": "उदा. Acme Corp",
+    "Email Address": "ईमेल पत्ता",
+    "e.g. billing@acme.com": "उदा. billing@acme.com",
+    "Phone Number": "फोन क्रमांक",
+    "e.g. +91 98765 43210": "उदा. +91 98765 43210",
+    "GSTIN": "जीएसटीआयएन",
+    "e.g. 27AAAAA1111A1Z1": "उदा. 27AAAAA1111A1Z1",
+    "Billing Address": "बिलिंग पत्ता",
+    "e.g. 123 Main St, Mumbai, MH": "उदा. 123 Main St, मुंबई, MH",
+    "Save Customer": "ग्राहक जतन करा",
+    "Search customers by name…": "नावाने ग्राहक शोधा…",
+    "Contact": "संपर्क",
+    "Balance Due": "थकीत शिल्लक",
+    "No customers found matching your search.": "तुमच्या शोधाशी जुळणारा कोणताही ग्राहक सापडला नाही.",
+    "Are you sure you want to remove this customer?": "तुम्हाला हा ग्राहक हटवायचा आहे का?",
+    "Edit customer": "ग्राहक संपादित करा",
+    "Delete customer": "ग्राहक हटवा",
+    "Edit Customer": "ग्राहक संपादित करा",
+
+    "Back to sales": "विक्रीवर परत जा",
+    "Change Status": "स्थिती बदला",
+    "Record Payment": "पेमेंट नोंदवा",
+    "Print Invoice": "पावती छापा",
+    "BillBook Invoice": "बिलबुक पावती",
+    "Invoice": "पावती",
+    "Issued": "जारी केली",
+    "Due": "देय",
+    "Billed To": "बिल प्राप्तकर्ता",
+    "Email": "ईमेल",
+    "Phone": "फोन",
+    "Description": "वर्णन",
+    "Qty": "प्रमाण",
+    "Unit Price": "युनिट किंमत",
+    "Tax Rate": "कर दर",
+    "Amount": "रक्कम",
+    "Subtotal": "उप-एकूण",
+    "Tax": "कर",
+    "Discount": "सूट",
+    "Total": "एकूण",
+    "Amount Paid": "भरलेली रक्कम",
+    "Notes / Comments": "नोट्स / टिप्पण्या",
+    "Enter the amount collected from the customer. The balance due is":
+      "ग्राहकाकडून गोळा केलेली रक्कम प्रविष्ट करा. थकीत शिल्लक आहे",
+    "Payment Amount": "पेमेंट रक्कम",
+    "e.g. 500.00": "उदा. 500.00",
+    "Recording…": "नोंदवत आहे…",
+    "Are you sure you want to permanently delete this invoice? This action cannot be undone.":
+      "तुम्हाला ही पावती कायमची हटवायची आहे का? ही क्रिया पूर्ववत करता येत नाही.",
+    "draft": "मसुदा",
+    "pending": "प्रलंबित",
+    "paid": "भरलेले",
+    "overdue": "थकीत",
+    "cancelled": "रद्द",
+
+    "New Sale": "नवीन विक्री",
+    "Search sales…": "विक्री शोधा…",
+    "All": "सर्व",
+    "No invoices match this filter.": "या फिल्टरशी जुळणारी कोणतीही पावती नाही.",
+
+    // ── Headers & Dropdown Actions ──────────────────────────────────
     "Super Admin": "सुपर प्रशासक",
     "Tenant Admin": "भाडेकरू प्रशासक",
     "User": "वापरकर्ता",
@@ -142,7 +473,7 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     "Clear all": "सर्व साफ करा",
     "No unread notifications": "कोणतीही नवीन अधिसूचना नाही",
 
-    // General Common UI
+    // ── General Common UI ───────────────────────────────────────────
     "Search": "शोधा",
     "Search...": "शोधा...",
     "Save": "जतन करा",
@@ -152,14 +483,81 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     "Save Changes": "बदलाव जतन करा",
     "Actions": "कृती",
     "Status": "स्थिती",
-    "Amount": "रक्कम",
     "Date": "तारीख",
     "Price": "किंमत",
     "Name": "नाव",
-    "Email": "ईमेल",
-    "Phone": "फोन",
+    "Close": "बंद करा",
+    "Select all": "सर्व निवडा",
+    "View": "पहा",
+    "Create": "तयार करा",
+    "Import": "आयात करा",
+    "Suppliers": "पुरवठादार",
+    "Reports": "अहवाल",
+    "Settings": "सेटिंग्ज",
+    "Advance Payments": "आगाऊ पेमेंटे",
 
-    // Dashboard Screen
+        // ── Contacts / Suppliers ──────────────────────────────────────────
+    "Contacts": "संपर्क",
+    "Manage your customers, suppliers, and import contact lists from one place.":
+      "तुमचे ग्राहक, पुरवठादार आणि संपर्क यादी एकाच ठिकाणी व्यवस्थापित करा.",
+    "Import Customers": "ग्राहक आयात करा",
+    "Import Suppliers": "पुरवठादार आयात करा",
+    "Upload a CSV file to bulk import customer records into BillBook.":
+      "बिलबुकमध्ये ग्राहक रेकॉर्ड मोठ्या प्रमाणात आयात करण्यासाठी CSV फाइल अपलोड करा.",
+    "Upload a CSV file to bulk import supplier records into BillBook.":
+      "बिलबुकमध्ये पुरवठादार रेकॉर्ड मोठ्या प्रमाणात आयात करण्यासाठी CSV फाइल अपलोड करा.",
+    "Drag and drop a CSV here, or click to select a file":
+      "CSV फाइल येथे ड्रॅग आणि ड्रॉप करा किंवा फाइल निवडण्यासाठी क्लिक करा",
+    "Required columns: name, email, phone, billing_address, gstin":
+      "आवश्यक स्तंभ: नाव, ईमेल, फोन, बिलिंग पत्ता, जीएसटीआयएन",
+    "Required columns: name, mobile, email, phone, gst_number, tax_number, opening_balance, country, state, city, postcode, address":
+      "आवश्यक स्तंभ: नाव, मोबाइल, ईमेल, फोन, जीएसटी क्रमांक, कर क्रमांक, सुरुवातीची शिल्लक, देश, राज्य, शहर, पोस्टकोड, पत्ता",
+    "Selected file": "निवडलेली फाइल",
+    "Use a CSV with one customer per row. Empty optional fields are allowed.":
+      "प्रत्येक पंक्तीत एक ग्राहक असलेली CSV वापरा. रिक्त पर्यायी फील्डला परवानगी आहे.",
+    "Use a CSV with one supplier per row. Empty optional fields are allowed.":
+      "प्रत्येक पंक्तीत एक पुरवठादार असलेली CSV वापरा. रिक्त पर्यायी फील्डला परवानगी आहे.",
+    "Import customers": "ग्राहक आयात करा",
+    "Import suppliers": "पुरवठादार आयात करा",
+    "Importing…": "आयात होत आहे…",
+
+    "Manage supplier contacts, opening balances and address details.":
+      "पुरवठादार संपर्क, सुरुवातीची शिल्लक आणि पत्ता तपशील व्यवस्थापित करा.",
+    "total suppliers": "एकूण पुरवठादार",
+    "Add Supplier": "पुरवठादार जोडा",
+    "You don't have permission to add suppliers.":
+      "तुम्हाला पुरवठादार जोडण्याची परवानगी नाही.",
+    "Supplier Name": "पुरवठादाराचे नाव",
+    "e.g. Acme Suppliers": "उदा. Acme पुरवठादार",
+    "Mobile": "मोबाइल",
+    "e.g. supplier@example.com": "उदा. supplier@example.com",
+    "e.g. 022 1234 5678": "उदा. 022 1234 5678",
+    "GST Number": "जीएसटी क्रमांक",
+    "Tax Number": "कर क्रमांक",
+    "e.g. 123456789": "उदा. 123456789",
+    "Opening Balance": "सुरुवातीची शिल्लक",
+    "Country": "देश",
+    "State": "राज्य",
+    "City": "शहर",
+    "Postcode": "पोस्टकोड",
+    "Address": "पत्ता",
+    "Start typing or choose a country": "टाइप करणे सुरू करा किंवा देश निवडा",
+    "Start typing or choose a state": "टाइप करणे सुरू करा किंवा राज्य निवडा",
+    "Start typing or choose a city": "टाइप करणे सुरू करा किंवा शहर निवडा",
+    "Save Supplier": "पुरवठादार जतन करा",
+    "Search suppliers by name…": "नावाने पुरवठादार शोधा…",
+    "Supplier": "पुरवठादार",
+    "GST / Tax": "जीएसटी / कर",
+    "Balance": "शिल्लक",
+    "No suppliers found matching your search.":
+      "तुमच्या शोधाशी जुळणारा कोणताही पुरवठादार सापडला नाही.",
+    "Are you sure you want to remove this supplier?":
+      "तुम्हाला हा पुरवठादार हटवायचा आहे का?",
+    "Edit supplier": "पुरवठादार संपादित करा",
+    "Delete supplier": "पुरवठादार हटवा",
+    "Edit Supplier": "पुरवठादार संपादित करा",
+
+    // ── Dashboard Screen ─────────────────────────────────────────────
     "Overview of your business performance": "तुमच्या व्यवसायाच्या कामगिरीचे विहंगावलोकन",
     "Sales Due": "विक्री देय",
     "Purchase Due": "खरेदी देय",
@@ -168,40 +566,44 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     "Recent Sales Invoices": "अलीकडील विक्री पावत्या",
     "Stock Alert": "स्टॉक चेतावणी",
     "Trending Products": "ट्रेंडिंग उत्पादने",
-    "Invoice": "पावती",
     "Customer": "ग्राहक",
     "Recent Products": "अलीकडील उत्पादने",
     "Stock Quantity": "स्टॉक प्रमाण",
-    "Unit Price": "युनिट किंमत",
     "Trending Items": "ट्रेंडिंग वस्तू",
     "Quantity": "प्रमाण",
     "Stock Alert Items": "स्टॉक अलर्ट वस्तू",
     "SKU": "एसकेयू",
     "Current Stock": "सध्याचा स्टॉक",
 
-    // Count Cards
+    // ── Count Cards ──────────────────────────────────────────────────
     "Invoices": "पावत्या",
     "Paid Invoices": "भरलेल्या पावत्या",
 
-    // Period Filters
+    // ── Period Filters ──────────────────────────────────────────────
     "Today": "आज",
     "Weekly": "साप्ताहिक",
     "Monthly": "मासिक",
     "Yearly": "वार्षिक",
-    "All": "सर्व",
 
-    // Bar Chart
+    // ── Bar Chart ────────────────────────────────────────────────────
     "Purchase, Sales & Expense Bar Chart": "खरेदी, विक्री आणि खर्च चार्ट",
     "Purchase": "खरेदी",
+    "No data for the selected period.": "निवडलेल्या कालावधीसाठी कोणताही डेटा नाही.",
 
-    // Table Headers
+    // ── Table Headers ──────────────────────────────────────────────
     "SL.No": "अनु.क्र.",
+    "Sl.No": "अनु.क्र.",
     "Item Name": "वस्तूचे नाव",
     "Sales Price": "विक्री किंमत",
     "Stock": "स्टॉक",
     "Unit": "युनिट",
+    "Invoice ID": "पावती आयडी",
+    "Created By": "द्वारे तयार केले",
+    "units": "युनिट्स",
+    "Tax %": "कर %",
+    "Discount value": "सूट रक्कम",
 
-    // Datatable Controls
+    // ── Datatable Controls ──────────────────────────────────────────
     "Show": "दाखवा",
     "entries": "नोंदी",
     "Copy": "कॉपी",
@@ -215,10 +617,123 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     "Previous": "मागील",
     "Next": "पुढील",
 
-    // Notifications Mock Texts
+    // ── Statuses ─────────────────────────────────────────────────────
+    "Draft": "मसुदा",
+    "Pending": "प्रलंबित",
+    "Paid": "भरलेले",
+    "Overdue": "थकीत",
+    "Cancelled": "रद्द",
+
+    // ── Invoice Items Editor ──────────────────────────────────────
+    "Item or service name": "वस्तू किंवा सेवेचे नाव",
+    "Add line item": "ओळ जोडा",
+    "Remove line item": "ओळ काढा",
+
+    // ── Fallback Messages ──────────────────────────────────────────
+    "No products yet. Add your first product to see it here.": "अद्याप कोणतीही उत्पादने नाहीत. ते येथे पाहण्यासाठी आपले पहिले उत्पादन जोडा.",
+    "No invoices yet. Create your first invoice.": "अद्याप कोणतीही पावती नाही. आपली पहिली पावती तयार करा.",
+    "All products are above the threshold-unit threshold.": "सर्व उत्पादने मर्यादेच्या वर आहेत.",
+    "No matching records found": "कोणतेही जुळणारे रेकॉर्ड आढळले नाहीत",
+
+    // ── Notifications Mock Texts ──────────────────────────────────
     "Welcome to BillBook workspace!": "बिलबुक वर्कस्पेसमध्ये आपले स्वागत आहे!",
     "Low stock alert: Premium Widget is below 10 units": "कमी स्टॉक चेतावणी: प्रीमियम विजेट 10 युनिट्सपेक्षा कमी आहे",
     "New customer Rohal Retail Pvt Ltd registered": "नवीन ग्राहक रोहल रिटेल प्रायव्हेट लिमिटेड नोंदणीकृत झाली",
+
+    // ── Advance Payments Module ──────────────────────────────────────
+    "Advance Payments List": "आगाऊ पेमेंट सूची",
+    "Track advance payments received from customers.": "ग्राहकांकडून मिळालेली आगाऊ पेमेंट ट्रॅक करा.",
+    "New Advance Payment": "नवीन आगाऊ पेमेंट",
+    "Edit Advance Payment": "आगाऊ पेमेंट संपादित करा",
+    "Select customer": "ग्राहक निवडा",
+    "Payment Date": "पेमेंट तारीख",
+    "Payment Type": "पेमेंट प्रकार",
+    "Reference (optional)": "संदर्भ (पर्यायी)",
+    "Cheque no., transaction ID, etc.": "चेक क्र., व्यवहार आयडी, इ.",
+    "Notes (optional)": "नोट्स (पर्यायी)",
+    "Cash": "रोख",
+    "Bank Transfer": "बँक हस्तांतरण",
+    "Cheque": "चेक",
+    "Online": "ऑनलाइन",
+    "Applied": "लागू",
+    "Are you sure you want to delete this advance payment?": "तुम्हाला ही आगाऊ पेमेंट हटवायची आहे का?",
+    "ID": "आयडी",
+    "Search by ID or customer…": "आयडी किंवा ग्राहकानुसार शोधा…",
+    "No advance payments found.": "कोणतीही आगाऊ पेमेंट सापडली नाही.",
+    "Page": "पृष्ठ",
+
+        // ── Login / Signup ──────────────────────────────────────────────
+    "Welcome back": "परत स्वागत आहे",
+    "Sign in to your BillBook workspace": "तुमच्या BillBook वर्कस्पेसमध्ये साइन इन करा",
+    "Signing in…": "साइन इन होत आहे…",
+    "Sign in": "साइन इन करा",
+    "New business?": "नवीन व्यवसाय?",
+    "Set up your workspace": "तुमचे वर्कस्पेस सेट करा",
+    "Start billing in under a minute": "एका मिनिटात बिलिंग सुरू करा",
+    "Business name": "व्यवसायाचे नाव",
+    "Your name": "तुमचे नाव",
+    "At least 8 characters": "किमान ८ अक्षरे",
+    "Setting up…": "सेट होत आहे…",
+    "Create workspace": "वर्कस्पेस तयार करा",
+    "Already have a workspace?": "आधीच वर्कस्पेस आहे?",
+
+    // ── POS ──────────────────────────────────────────────────────────
+    "Create a point-of-sale sale quickly with product cards and cart totals.":
+      "उत्पाद कार्ड आणि कार्ट एकूण सह द्रुतपणे पॉइंट-ऑफ-सेल विक्री तयार करा.",
+    "Add customer": "ग्राहक जोडा",
+    "Product search": "उत्पाद शोध",
+    "Search products...": "उत्पादे शोधा...",
+    "Walk-in customer": "वॉक-इन ग्राहक",
+    "Cart": "कार्ट",
+    "items": "आयटम",
+    "Add products to the cart to start the sale.": "विक्री सुरू करण्यासाठी कार्टमध्ये उत्पादने जोडा.",
+    "Item": "आयटम",
+    "Grand total": "एकूण रक्कम",
+    "available": "उपलब्ध",
+    "Hold": "होल्ड",
+    "Multiple": "एकाधिक",
+    "Pay All": "सर्व भरा",
+    "Processing…": "प्रक्रिया होत आहे…",
+    "Review the order before checkout.": "चेकआउटपूर्वी ऑर्डरचे पुनरावलोकन करा.",
+
+    // ── Products ──────────────────────────────────────────────────────
+    "Import Products": "उत्पादने आयात करा",
+    "Upload a CSV file to bulk import products.":
+      "मोठ्या प्रमाणात आयात करण्यासाठी CSV फाइल अपलोड करा.",
+    "Import products": "उत्पादने आयात करा",
+    "Drag and drop a CSV file here, or click to select a file.":
+      "CSV फाइल येथे ड्रॅग आणि ड्रॉप करा, किंवा फाइल निवडण्यासाठी क्लिक करा.",
+    "Required columns: name, sku, description, unit_price, tax_rate, stock_quantity, unit":
+      "आवश्यक स्तंभ: नाव, sku, वर्णन, युनिट किंमत, कर दर, स्टॉक प्रमाण, युनिट",
+    "Selected file:": "निवडलेली फाइल:",
+    "You do not have permission to import products. Contact your administrator to request the products.import permission.":
+      "तुम्हाला उत्पादने आयात करण्याची परवानगी नाही. products.import परवानगीची विनंती करण्यासाठी तुमच्या व्यवस्थापकाशी संपर्क साधा.",
+    "Stock Status": "स्टॉक स्थिती",
+    "Add Product": "उत्पादन जोडा",
+    "Save Product": "उत्पादन जतन करा",
+
+    // ── Roles ────────────────────────────────────────────────────────
+    "Define what each role can see and do.":
+      "प्रत्येक भूमिका काय पाहू आणि करू शकते ते परिभाषित करा.",
+    "New Role": "नवीन भूमिका",
+    "Built-in": "अंगभूत",
+    "permissions granted": "परवानग्या प्रदान केल्या",
+    "Edit role": "भूमिका संपादित करा",
+    "New role": "नवीन भूमिका",
+    "This is a built-in role and can't be edited.":
+      "ही एक अंगभूत भूमिका आहे आणि ती संपादित करता येत नाही.",
+    "Role name": "भूमिकेचे नाव",
+    "Save role": "भूमिका जतन करा",
+
+    // ── Users ────────────────────────────────────────────────────────
+    "Add User": "वापरकर्ता जोडा",
+    "Search users…": "वापरकर्ते शोधा…",
+    "Joined": "सामील झाले",
+    "Active": "सक्रिय",
+    "Inactive": "निष्क्रिय",
+    "No users yet.": "अद्याप कोणतेही वापरकर्ते नाहीत.",
+    "Add user": "वापरकर्ता जोडा",
+    "Adding…": "जोडत आहे…",
   }
 };
 

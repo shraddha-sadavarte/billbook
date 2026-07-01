@@ -1,5 +1,6 @@
 import { NavLink, Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useTranslation } from "../../context/LanguageContext";
 
 const NAV_ITEMS = [
   { to: "customers", label: "Customers", permission: "customers.view" },
@@ -9,14 +10,15 @@ const NAV_ITEMS = [
 ];
 
 export function ContactsLayout() {
+  const { t } = useTranslation();
   const { hasPermission } = useAuth();
   const visibleNavItems = NAV_ITEMS.filter((item) => hasPermission(item.permission));
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-ink-900">Contacts</h1>
-        <p className="text-sm text-slate-500">Manage your customers, suppliers, and import contact lists from one place.</p>
+        <h1 className="text-2xl font-semibold text-ink-900">{t("Contacts")}</h1>
+        <p className="text-sm text-slate-500">{t("Manage your customers, suppliers, and import contact lists from one place.")}</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -33,7 +35,7 @@ export function ContactsLayout() {
               }`
             }
           >
-            {item.label}
+            {t(item.label)}
           </NavLink>
         ))}
       </div>
